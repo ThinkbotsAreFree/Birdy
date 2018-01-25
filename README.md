@@ -43,10 +43,6 @@ Here is a complete list of the 18 characters with special meaning.
     []      escape block
 ```
 
-## Table of contents
-
-[TOC]
-
 ## Overview
 
 ### Pub/sub

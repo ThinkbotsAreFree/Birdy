@@ -20,8 +20,8 @@ Here is a complete list of the 30 characters with special meaning.
 
     °       insert fresh ID
 
-    ¤       insert global value
-    :       set global value
+    ¤1      insert global value
+    :1      set global value
 
     #1      capture value
     $1      insert value
@@ -111,6 +111,20 @@ Square brackets are nestable, in which case they have to be balanced.
 ```
 This would publish `You can nest [balanced] square brackets too`, where only the outer square brackets are removed.
 
+### Signature of a peer
+
+The signature of a peer is like a name, except it's not necessarily unique. It's a meta information that is always transfered with a message.
+
+You set a peer's signature with the `_` command.
+```
+_ Zorro > Hey Tornado
+```
+The peers that receive this message can insert the message sender signature with the `§` function.
+```
++ Hey Tornado > looks like § lost his brave horse
+```
+This peer would send `looks like Zorro lost his brave horse`.
+
 ## Execution of a peer's program
 
 ### Command categories
@@ -119,19 +133,19 @@ There are **action-commands** and **condition-commands**.
 
 A condition-command performs a logical test. `+ - ? !` are condition-commands.
  
-An action-command performs an action. `_ = & % € @ > < ^ { } * ~` are action-commands.
+An action-command performs an action. `_ : = & % € @ > < ^ { } * ~` are action-commands.
 
 ### Wildcards
 
 In arguments:
 * the *capture value* character `#` can be used to capture strings in **condition-commands**,
-* the *insert value* character `$` can be used to insert previously captured characters in **any command**.
+* the *insert value* character `$` can be used to insert previously captured strings in **any command**.
 ```
 + user wants #1 > is $1 available
 ```
 If a peer with this code receives a message "user wants another topic", it will publish a message "is another topic available".
 
-The character immediately following `#` and `$` is the variable identifier. It can be any non-special character, like a digit or a letter.
+The character immediately following `#` and `$` is the **variable identifier**. It can be any non-special character, like a digit or a letter. Yes I know, it's only 1 character.
 
 ### Parentheses in glob patterns
 
@@ -185,11 +199,13 @@ This would choose `user` as emission channel and send the message `my dog likes 
 
 #### Global variables
 
-For convenience, peers can read (insert) global variables with `¤1`, and write (assign) global variables with `:1`. Since variable identifiers are 1 character long, there's only a limited number of them. They should be used only as a very general blackboard, or configuration panel.
+For convenience (or rather for potential use cases I can't think of right now), peers can read (insert) global variables with `¤1`, and write (assign) global variables with `:1`. Since variable identifiers are 1 character long, there's only a limited number of them. They should be used rarely, maybe as a very general blackboard, or as configuration panel.
+
+If two peers assign a value to the same global variable simultaneously, nothing happens: value of the global variable remains unchanged.
 
 ### State persistence
 
-The whole state of a peer remains unchanged between receptions of 2 messages. The emission channel and variables' content won't be deleted after a message has been treated.
+The whole state of a peer remains unchanged between the receptions of 2 messages. The emission channel and variables' content won't be deleted after a message has been treated.
 ```
 | global
 + save #1 > done
@@ -211,13 +227,13 @@ To subscribe to a new channel, a peer must execute the *subscribe* command `{`. 
 ```
 At startup, this peer is configured to listen to the `global` channel.
 
-If it receives a `please listen to subcons` message, it will subscribe to the `dynamic.subcons` channel, and will start receiving messages published on this channel too.
+If it receives a `please listen to subch1` message, it will subscribe to the `dynamic.subch1` channel, and will start receiving messages published on this channel too.
 
 ### Channel patterns
 
 It is possible to configure a peer to listen to every channel that matches a pattern.
 
-For example, `{ ch/#A` means "subscribe to every channel that matches `ch/#A`". With this subscription, when a message is received on channel `ch/bar`, the variable `A` will contain `bar`.
+For example, `{ ch.#A` means "subscribe to every channel that matches `ch.#A`". With this subscription, when a message is received on channel `ch.bar`, the variable `A` will contain `bar`.
 
 ### Peers creation
 
@@ -231,7 +247,7 @@ When this peer receives a `make greeter hey` message, it will create the followi
 ```
 | from user + hey > hello
 ```
-Notice how we didn't escape the `$1` value insertion in the *create peer* command.
+Notice how I didn't escape the `$1` value insertion in the *create peer* command.
 
 ### Peers death
 
@@ -239,7 +255,75 @@ The *die* command `~` allows a peer to delete itself.
 
 The argument of the *die* command is the "testament" of the peer: it is a message that will be emitted just before the peer is deleted.
 
-## Commands detailed
+## Commands and functions detailed
+
+### § insert sender signature
+
+The *insert sender signature* function returns the signature of the peer who sent the current message.
+
+### _ set my signature
+
+The *set my signature* command is used to choose a string as the signature of the peer.
+
+### ° insert fresh ID
+
+The *insert fresh ID* function inserts an auto-increment ID number, made of digits only. Its purpose is to create new vocabulary.
+
+### ¤ insert global value
+
+The *insert global value* function insert the current value of a global variable.
+
+### : set global value
+
+The *set global value* command tries to assign a value to a global variable. It can fail if several peers try to do it simultaneously, in which case nothing happens.
+
+### #1 capture value
+
+The *capture value* function capture a string and assigns it to a variable.
+
+### $1 insert value
+
+The *insert value* funtcion inserts the value of a variable.
+
+### =1 set value
+
+The *set value* command assigns a value to a variable.
+
+### &1 append to value
+
+The *append to value* command concatenates a string to the value in a variable.
+
+### %1 / replace in value
+
+The *replace in value* performs substring substitution in a variable.
+
+### €1 execute value
+
+The *execute value* evaluates a value as if it was a fragment of code.
+
+### ?1 if value matches
+
+The *if value matches* command is a condition-command that succeeds only if the variable's value matches a pattern.
+
+If it succeeds, the wildcards used in the pattern will contain the captured strings.
+
+### !1 if value does not match
+
+The *if value does not match* command is a condition-command that succeeds only if the variable's value doesn't match a pattern.
+
+If it fails, the wildcards used in the pattern will contain the captured strings.
+
+### + if message match
+
+The *if message match* command is a condition-command that succeeds only if the received message matches a pattern.
+
+If it succeeds, the wildcards used in the pattern will contain the captured strings.
+
+### - if message doesn't match
+
+The *if message doesn't match* command is a condition-command that succeeds only if the received message doesn't match a pattern.
+
+If it fails, the wildcards used in the pattern will contain captured strings.
 
 ### @ on channel
 
@@ -259,29 +343,9 @@ All peers that subscribed to this channel will receive the message.
 
 The *reply* command sends a message only to the peer that published the received message.
 
-### + if match
+### ^ send to self
 
-The *if match* command is a condition-command that succeeds only if the received message matches a pattern.
-
-If it succeeds, the wildcards used in the pattern will contain captured characters.
-
-### - if no match
-
-The *if no match* command is a condition-command that succeeds only if the received message doesn't match a pattern.
-
-If it fails, the wildcards used in the pattern will contain captured characters.
-
-### ? if code matches
-
-The *if code matches* command is a condition-command that succeeds only if the peer's source code matches a pattern.
-
-If it succeeds, the wildcards used in the pattern will contain captured characters.
-
-### ! if code does not match
-
-The *if code does not match* command is a condition-command that succeeds only if the peer's source code doesn't match a pattern.
-
-If it fails, the wildcards used in the pattern will contain captured characters.
+The *send to self* command sends a message only to the sending peer.
 
 ### { subscribe
 
@@ -290,18 +354,6 @@ The *subscribe* command makes the peer listen to a channel, or to every channel 
 ### } unsubscribe
 
 The *unsubscribe* command makes the peer stop listening to a channel, or to every channel matching a pattern.
-
-### $ store in code
-
-The *store in code* command appends a string to the peer's source code.
-
-### % remove from code
-
-The *remove from code* command removes every part of the peer's source code that matches a pattern.
-
-### _ do nothing
-
-The *do nothing* command does nothing. Its purpose is to store data in the peer's source code, or to separate series of condition-commands without doing anything.
 
 ### * create peer
 

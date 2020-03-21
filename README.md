@@ -8,48 +8,56 @@ Birdy is
 * a real-time **chatbot engine**
 * designed to be as small as possible while still being powerful and easy to use.
 
-A declarative language, based on special characters instead of keywords, is used to describe a set of nodes called "peers", which communicate asynchronously through a **publish/subscribe** system.
+A declarative language, based on special characters instead of keywords, is used to describe a population of nodes called "peers", which communicate asynchronously through a **publish/subscribe** system.
 
-Here is a complete list of the 18 characters with special meaning.
+Here is a complete list of the 28 characters with special meaning.
 
 ```
     |       peer
 
-    #0      capture wildcard
-    &0      insert wildcard
+    §       insert sender signature
+    _       set my signature
+
+    °       insert fresh ID
+
+    #1      capture value
+    $1      insert value
+    =1      set value
+    &1      append to value
+    %1 /    replace in value
+    €1      execute value
+
+    ?1      if value matches
+    !1      if v doesn't match
+
+    +       if message matches
+    -       if msg doesn't match
 
     @       on channel
     >       publish
     <       reply
-
-    +       if match
-    -       if no match
-
-    ?       if code matches
-    !       if code does not match
+    ^       send to self
 
     {       subscribe
     }       unsubscribe
-
-    $       store in code
-    %       remove from code
-
-    _       do nothing
 
     *       create peer
 
     ~       die
 
     []      escape block
+    ()      structured data
+
+    ""      comment
 ```
 
 ## Overview
 
 ### Pub/sub
 
-A Birdy program is made of a lot of very small reactive agents. We call these agents "peers".
+A Birdy program is made of a lot of very small reactive agents. We'll call these agents "peers".
 
-During execution of the program, peers continuously receive and send messages to one another, asynchronously, and anonymously.
+During the execution of the VM, peers continuously receive and send messages to one another, asynchronously, and anonymously.
 
 The Wikipedia [article](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) about the pub/sub pattern gives the following definition.
 > In software architecture, publish/subscribe is a messaging pattern where senders of messages, called publishers, do not program the messages to be sent directly to specific receivers, called subscribers, but instead categorize published messages into classes without knowledge of which subscribers, if any, there may be. Similarly, subscribers express interest in one or more classes and only receive messages that are of interest, without knowledge of which publishers, if any, there are.
@@ -98,7 +106,7 @@ Square brackets are nestable. In that case, they have to be balanced.
 ```
 > You can [nest [balanced] square brackets] too
 ```
-This would publish `You can nest [balanced] square brackets too`. As you can see, only the outer square brackets are removed.
+This would publish `You can nest [balanced] square brackets too`, where only the outer square brackets are removed.
 
 ## Execution of a peer's program
 

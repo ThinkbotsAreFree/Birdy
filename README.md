@@ -139,7 +139,7 @@ An action-command performs an action. `_ : = & % € @ > < ^ { } * ~` are action
 
 In arguments:
 * the *capture value* character `#` can be used to capture strings in **condition-commands**,
-* the *insert value* character `$` can be used to insert previously captured strings in **any command**.
+* the *insert value* character `$` can be used to insert previously stored strings in **any command**.
 ```
 + user wants #1 > is $1 available
 ```
@@ -171,7 +171,7 @@ If the `+ if1` test fails, the control jumps directly to the `+ if 3` test. Then
 
 ### Variables
 
-A string captured with `#x` is in fact stored in the variable `x`. There are several ways to manipulate values stored in variables.
+A string captured with `#x` is in fact stored in the variable `x`. Variables are local to a peer. There are several ways to manipulate values stored in variables.
 
 Naturally, you can set the value of a variable.
 ```

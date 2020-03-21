@@ -135,6 +135,8 @@ A condition-command performs a logical test. `+ - ? !` are condition-commands.
  
 An action-command performs an action. `_ : = & % € @ > < ^ { } * ~` are action-commands.
 
+A function returns a value. `§ ° ¤ $` are functions.
+
 ### Wildcards
 
 In arguments:
@@ -191,11 +193,11 @@ You can also replace all occurences of a substring, using an extra character `/`
 ```
 Now `x` contains the value `my new name is longer`.
 
-There's also a powerful command that lets you execute a value, as if it was a fragment of code. For example, say a variable `y` contains `@ user > my dog likes`.
+There's also a powerful command that lets you **execute a value**, as if it was a fragment of code. For example, say a variable `y` contains `@ user > my dog likes`.
 ```
 €y my cat
 ```
-This would choose `user` as emission channel and send the message `my dog likes my cat`.
+This would choose `user` as emission channel and send the message `my dog likes my cat`. Executing values can contain executing values.
 
 Variables can be tested by conditionals just like the received message.
 ```
@@ -205,7 +207,7 @@ This will send `it is longer` only if the variable `x` contains `my value is lon
 
 #### Global variables
 
-For convenience (or rather for potential use cases I can't think of right now), peers can read (insert) global variables with `¤1`, and write (assign) global variables with `:1`. Since variable identifiers are 1 character long, there's only a limited number of them. They should be used rarely, maybe as a very general blackboard, or as configuration panel.
+For convenience (or rather for potential use cases I can't think of right now), peers can read (insert) global variables with the function `¤1`, and write (assign) global variables with the command `:1`. Since variable identifiers are 1 character long, there's only a limited number of them. They should be used rarely, maybe as a very general blackboard, or as configuration panel.
 
 If two peers assign a value to the same global variable simultaneously, nothing happens: value of the global variable remains unchanged.
 

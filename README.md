@@ -4,13 +4,13 @@
 # Birdy
 
 Birdy is
-* a message oriented virtual machine
-* a real-time **chatbot engine**
+* a message oriented virtual machine,
+* a real-time **chatbot engine**,
 * designed to be as small as possible while still being powerful and easy to use.
 
 A declarative language, based on special characters instead of keywords, is used to describe a population of nodes called "peers", which communicate asynchronously through a **publish/subscribe** system.
 
-Here is a complete list of the 28 characters with special meaning.
+Here is a complete list of the 30 characters with special meaning.
 
 ```
     |       peer
@@ -19,6 +19,9 @@ Here is a complete list of the 28 characters with special meaning.
     _       set my signature
 
     °       insert fresh ID
+
+    ¤       insert global value
+    :       set global value
 
     #1      capture value
     $1      insert value
@@ -55,7 +58,7 @@ Here is a complete list of the 28 characters with special meaning.
 
 ### Pub/sub
 
-A Birdy program is made of a lot of very small reactive agents. We'll call these agents "peers".
+A Birdy program is made of a lot of very small reactive agents. Let's call these agents "peers".
 
 During the execution of the VM, peers continuously receive and send messages to one another, asynchronously, and anonymously.
 
@@ -102,7 +105,7 @@ Here, the `<` character isn't interpreted as a *reply* command, but simply as pa
 
 The enclosing square brackets are removed from the argument. In the previous example, the published message is not `sweet [<3]` but simply `sweet <3`.
 
-Square brackets are nestable. In that case, they have to be balanced.
+Square brackets are nestable, in which case they have to be balanced.
 ```
 > You can [nest [balanced] square brackets] too
 ```
@@ -116,31 +119,33 @@ There are **action-commands** and **condition-commands**.
 
 A condition-command performs a logical test. `+ - ? !` are condition-commands.
  
-An action-command performs an action. `@ > < { } $ % _ * ~` are action-commands.
+An action-command performs an action. `_ = & % € @ > < ^ { } * ~` are action-commands.
 
 ### Wildcards
 
-In arguments, the *capture wildcard* character `#` can be used to capture characters in condition-commands, and the *insert wildcard* character can be used to insert previously captured characters in any command.
+In arguments:
+* the *capture value* character `#` can be used to capture strings in **condition-commands**,
+* the *insert value* character `$` can be used to insert previously captured characters in **any command**.
 ```
-+ user wants #1 > is &1 available
++ user wants #1 > is $1 available
 ```
 If a peer with this code receives a message "user wants another topic", it will publish a message "is another topic available".
 
-The character immediately following `#` and `&` is the wildcard identifier. It can be any non-special character, like a digit or a letter.
+The character immediately following `#` and `$` is the variable identifier. It can be any non-special character, like a digit or a letter.
 
 ### Parentheses in glob patterns
 
-Pattern matching in Birdy works almost like file glob patterns, with `#0` instead of `*`. But there's a key difference.
+Pattern matching in Birdy works almost like file glob patterns, with `#1` instead of `*`. But there's a key difference.
 
-Pattern matching in Birdy is **parenthese-sensitive**. If an opening parenthese is captured, the corresponding closing parenthese must also be captured. If an opening parenthese is not captured, the corresponding closing parenthese cannot be captured.
+Pattern matching in Birdy is **parentheses-sensitive**. If an opening parenthesis is captured, the corresponding closing parenthesis must also be captured. If an opening parenthesis is not captured, the corresponding closing parenthesis cannot be captured.
 
 In other words, if a capture has parentheses, they are necessarily balanced.
 
-This feature makes structured messaging possible and easy: since we can work with s-expression based messages, we can work with any kind of data structure.
+This important feature makes structured messaging possible and easy: since peers can manipulate and send s-expression based messages, any kind of data structure can be expressed.
 
 ### Control flow
 
-When a peer receives a message, the message goes through all the peer's commands, one by one, in order.
+When a peer receives a message, the message goes through all of the peer's commands, one by one, in order.
 
 When the message flows through an action-command, the action is executed.
 
@@ -148,42 +153,49 @@ When it flows through a condition-command, a test is performed. If the test fail
 ```
 + if1 + if2 @ ch1 > msg1 + if3 + if4 > msg2
 ```
-If the `+ if1` test fails, control jumps directly to the `+ if 3` test. Then, if both `+ if3` and `+ if4` succeed, the `> msg2` action-command is executed.
+If the `+ if1` test fails, the control jumps directly to the `+ if 3` test. Then, if both `+ if3` and `+ if4` succeed, the `> msg2` action-command is executed.
 
-### Formulae
+### Variables
 
-It is possible to include arithmetical formulae in command arguments.
+A string captured with `#x` is in fact stored in the variable `x`. There are several ways to manipulate values stored in variables.
 
-A formula has to be enclosed in square brackets, and the character immediately following the opening square bracket has to be an equal sign `=`.
+Naturally, you can set the value of a variable.
 ```
-| counter
-+ found #1 new items
-? [_] (total: #2)
-% [_] (total: &2)
-$ [_] (total: [= &1 + &2])
-_ (total: 5)
+=x my new value
 ```
-The last command of this peer is a *do nothing* command. The *do nothing* command can be used as data storage. In this example, it is employed to save an item counter.
+This would assign the string `my new value` to the variable `x`.
 
-When this peer receives a `found 3 new items` message, the number `3` is stored in the `#1` wildcard.
+You can append (concatenate) a new value to a variable.
+```
+&x is longer
+```
+Now `x` contains the value `my new value is longer`.
 
-Then the peer scans its own code to find a `_ (total: #2)` fragment. It finds `_ (total: 5)`, so the number `5` is stored in the `#2` wildcard.
+You can also replace all occurences of a substring, using an extra character `/` between the old substring and the new substring.
+```
+%x value / name
+```
+Now `x` contains the value `my new name is longer`.
 
-Then, it removes `_ (total: 5)` from its own code.
+Lastly, you can execute a value, as if it was a fragment of code. For example, say a variable `y` contains `@ user > my dog likes`.
+```
+€y my cat
+```
+This would choose `user` as emission channel and send the message `my dog likes my cat`.
 
-Finally, it stores a new code fragment `_ (total: ` followed by the result of the formula `[= &1 + &2]` followed by a closing parenthese `)`.
+#### Global variables
 
-In formulae, unlike in escape blocks, wildcards are replaced by their content. The formula becomes `[= 3 + 5]`. Hence, the code fragment being stored is `_ (total: 8)`.
+For convenience, peers can read (insert) global variables with `¤1`, and write (assign) global variables with `:1`. Since variable identifiers are 1 character long, there's only a limited number of them. They should be used only as a very general blackboard, or configuration panel.
 
 ### State persistence
 
-The whole state of a peer remains unchanged between receptions of 2 messages. The emission channel and wildcards' content won't be deleted after a message has been treated.
+The whole state of a peer remains unchanged between receptions of 2 messages. The emission channel and variables' content won't be deleted after a message has been treated.
 ```
 | global
 + save #1 > done
-+ give it > I saved &1
++ give it > I saved $1
 ```
-After this peer receives a `save foo` message, wildcard `#1` will contain `foo`. Then, if it receives a `give it` message, it will publish `I saved foo`.
+After this peer receives a `save foo` message, the variable `#1` will contain `foo`. Then, if it receives a `give it` message, it will publish `I saved foo`.
 
 ## The network
 
@@ -193,19 +205,19 @@ Messages are published on channels. Channels are simply **strings**.
 
 Peers receive only messages that were published on channels they subscribed to.
 
-To subscribe to a new channel, a peer should execute the *subscribe* command `{`. To unsubscribe, the *unsubscribe* command `}` should be executed. Obviously, curly braces don't have to be balanced, because these two commands are independent.
+To subscribe to a new channel, a peer must execute the *subscribe* command `{`. To unsubscribe, the *unsubscribe* command `}` must be executed. Obviously, curly braces don't have to be balanced, because these two commands are independent.
 ```
-| global + please listen to #1 { dynamic/&1
+| global + please listen to #1 { dynamic.&1
 ```
 At startup, this peer is configured to listen to the `global` channel.
 
-If it receives a `please listen to subcons` message, it will subscribe to the `dynamic/subcons` channel, and will start receiving messages published on this channel too.
+If it receives a `please listen to subcons` message, it will subscribe to the `dynamic.subcons` channel, and will start receiving messages published on this channel too.
 
 ### Channel patterns
 
 It is possible to configure a peer to listen to every channel that matches a pattern.
 
-For example, `{ ch/#4` means "subscribe to every channel that matches `ch/#4`". With this subscription, when a message is received on channel `ch/bar`, the wildcard `#4` will contain `bar`.
+For example, `{ ch/#A` means "subscribe to every channel that matches `ch/#A`". With this subscription, when a message is received on channel `ch/bar`, the variable `A` will contain `bar`.
 
 ### Peers creation
 
@@ -213,13 +225,13 @@ The *create peer* command `*` takes its argument and makes a new peer out of it.
 ```
 | global
 + make greeter #1
-* [| from user + ]&1[ > hello]
+* [| from user + ]$1[ > hello]
 ```
 When this peer receives a `make greeter hey` message, it will create the following peer:
 ```
 | from user + hey > hello
 ```
-Notice how we didn't escape the `&1` wildcard in the *create peer* command.
+Notice how we didn't escape the `$1` value insertion in the *create peer* command.
 
 ### Peers death
 
@@ -298,44 +310,6 @@ The *create peer* command creates a new peer. The argument will be the new peer'
 ### ~ die
 
 The *die* command deletes the peer which executes it. The argument will be the last message published by the peer before it disappears.
-
-## Math operators
-
-```
-    precedence      syntax          name
-    ==========      ======          ====
-    
-    1               ( x )           grouping
-    1               | x |           abs
-    
-    2               x!              factorial
-    2               ~x              not
-    2               -x              unary minus
-    2               _x              truncate
-    
-    3               x ^ y           power
-    3               x V y           root
-    
-    4               x * y           mul
-    4               x / y           div
-    4               x % y           mod
-
-    5               x + y           add
-    5               x - y           sub
-
-    6               x < y           smaller        
-    6               x > y           larger
-    6               x <= y          smallereq
-    6               x >= y          largereq
-    6               x = y           equal
-    6               x <> y          unequal
-
-    7               x & y           and
-    7               x \ y           or
-
-    8               x ? y : z       condition
-
-```
 
 
 

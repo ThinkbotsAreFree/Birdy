@@ -191,11 +191,17 @@ You can also replace all occurences of a substring, using an extra character `/`
 ```
 Now `x` contains the value `my new name is longer`.
 
-Lastly, you can execute a value, as if it was a fragment of code. For example, say a variable `y` contains `@ user > my dog likes`.
+There's also a powerful command that lets you execute a value, as if it was a fragment of code. For example, say a variable `y` contains `@ user > my dog likes`.
 ```
 €y my cat
 ```
 This would choose `user` as emission channel and send the message `my dog likes my cat`.
+
+Variables can be tested by conditionals just like the received message.
+```
+?x my value is #w > it is $w
+```
+This will send `it is longer` only if the variable `x` contains `my value is longer`.
 
 #### Global variables
 

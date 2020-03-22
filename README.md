@@ -1,5 +1,5 @@
 
-![](http://noisett.lang.free.fr/birdy.png)
+![BirdyVM](https://raw.githubusercontent.com/ThinkbotsAreFree/Birdy/master/birdy.png)
 
 # BirdyVM
 

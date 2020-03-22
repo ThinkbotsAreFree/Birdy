@@ -1,5 +1,5 @@
 
-![](http://noisett.lang.free.fr/Birdy.png)
+![](http://noisett.lang.free.fr/birdy.png)
 
 # BirdyVM
 

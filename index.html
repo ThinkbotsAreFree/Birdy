@@ -14,8 +14,9 @@
 
     <textarea id="editor"></textarea>
     <button onclick="sys.parseEditor()">Parse</button>
-    <button onclick="sys.step()">Step</button>
-    <button onclick="sys.run()">Run</button>
+    <button onclick="sys.step(false)">Step once</button>
+    <button onclick="sys.step(true)">Step while</button>
+    <button onclick="sys.run()">Run loop</button>
 
     <div class="right">Output</div>
     <textarea id="output"></textarea>

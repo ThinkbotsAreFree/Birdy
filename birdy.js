@@ -13,7 +13,9 @@ const sys = {
         children: {},
         wildcards: {},
         leaves: []
-    }
+    },
+    jobQueue: [],
+    globalVar: {}
 };
 
 
@@ -23,6 +25,29 @@ function Unit(AST) {
     this.AST = AST;
     this.id = sys.newId();
     this.inbox = [];
+    this.signature = [this.id];
+    this.inChannel = ['global'];
+    this.outChannel = ['global'];
+
+    this.receivedMessage = [];
+    this.senderSignature = [];
+}
+
+
+
+Unit.prototype.publish = function(msg) {
+
+    var deliveryPlan = sys.getDeliveryPlan(this.outChannel);
+
+    for (let receiver in deliveryPlan) {
+
+        sys.jobQueue.push({
+            receiver:  receiver,
+            message:   msg,
+            signature: this.signature.slice(),
+            capture:   deliveryPlan[receiver]
+        });
+    }
 }
 
 
@@ -78,7 +103,7 @@ sys.parseEditor = function () {
     }
 
     doTest();
-}
+};
 
 
 
@@ -88,7 +113,7 @@ sys.createUnit = function (AST) {
     sys.unit[unit.id] = unit;
 
     sys.newPath(unit.id, unit.AST.initInput, sys.delivery);
-}
+};
 
 
 
@@ -109,30 +134,51 @@ sys.newPath = function (id, path, node) {
 
         node.leaves.push(id);
     }
-}
+};
+
+
+
+sys.delPath = function (id, path, node) {
+
+    if (path.length > 0) {
+
+        var sub = (path[0][0] === '#') ? "wildcards" : "children";
+
+        if (sys.delPath(id, path.slice(1), node[sub][path[0]]))
+
+            delete node[sub][path[0]];
+
+    } else {
+
+        node.leaves = node.leaves.filter(leaf => leaf !== id);
+    }
+
+    return ((Object.keys(node.children).length === 0)
+    && (Object.keys(node.wildcards).length === 0));
+};
 
 
 
 sys.getDeliveryPlan = function (channel) {
 
     sys.delivering = {};
+    sys.deliveryFound = 0;
 
     sys.buildDeliveryPlan(channel, sys.delivery, '{');
 
     return sys.delivering;
-}
+};
+
 
 
 sys.buildDeliveryPlan = function (channel, node, capture) {
 
     if (channel.length > 0) {
 
-        var channelSlice = channel.slice(1);
-
         if (node.children[channel[0]]) {
 
             sys.buildDeliveryPlan(
-                channelSlice,
+                channel.slice(1),
                 node.children[channel[0]],
                 capture
             );
@@ -140,28 +186,102 @@ sys.buildDeliveryPlan = function (channel, node, capture) {
 
         for (let wildcard in node.wildcards) {
 
-            sys.buildDeliveryPlan(
-                channelSlice,
-                node.wildcards[wildcard],
-                capture + `"${wildcard}":"${channel[0]}",`
-            );
+            let found = 0+sys.deliveryFound;
+            let sliceSize = 1;
+
+            while (found === sys.deliveryFound && sliceSize <= channel.length) {
+
+                sys.buildDeliveryPlan(
+                    channel.slice(sliceSize),
+                    node.wildcards[wildcard],
+                    capture + `"${wildcard}":[${channel.slice(0, sliceSize).map(c => '"'+c+'"').join(',')}],`
+                );
+                sliceSize += 1;
+            }
         }
 
     } else {
 
-        if (capture[capture.length-1] === ',') capture = capture.slice(0, -1);
-        var result = JSON.parse(capture+'}');
+        if (capture[capture.length - 1] === ',') capture = capture.slice(0, -1);
+        var result = JSON.parse(capture + '}');
 
         node.leaves.forEach(leaf => {
             sys.delivering[leaf] = result;
+            sys.deliveryFound += 1;
         });
     }
+};
+
+
+
+sys.step = function(keepRunning) {
+
+    var job = sys.jobQueue.shift();
+    var unit = sys.unit[job.receiver];
+
+    unit.receivedMessage = job.message;
+    unit.senderSignature = job.signature;
+
+    var todo = unit.AST.commands.slice();
+
+    while (todo.length > 0) {
+
+        var doing = todo.shift();
+        sys.execute[doing.com[0]](unit, doing);
+    }
+
+    output.value = JSON.stringify(sys, null, 4);
 }
+
+
+
+sys.execute = {
+
+
+
+    '>': function(unit, doing) { // publish
+
+        unit.publish(doing.arg);
+    },
+
+
+
+    '@': function(unit, doing) { // on channel
+
+        unit.outChannel = doing.arg;
+    },
+
+
+
+    '+': function(unit, doing) { // if message matches
+
+    },
+
+
+
+};
+
+
+
+sys.match = function(message, pattern) {
+
+    return {
+        success: true,
+        capture: {}
+    };
+};
 
 
 
 function doTest() {
 
-    console.log(sys.delivery);
-    console.log(sys.getDeliveryPlan(['a', 'b', 'c']));
+    //console.log(sys.getDeliveryPlan(['a', 'b', 'c']));
+
+    sys.unit[3].outChannel = ['a', 'i', 'j', 'b', 'c'];
+    sys.unit[3].publish(['this', 'is', 'it']);
+    console.log(sys.jobQueue);
+
+
 }
+
+

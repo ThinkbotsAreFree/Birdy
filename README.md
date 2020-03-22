@@ -166,10 +166,10 @@ When a peer receives a message, the message goes through all of the peer's comma
 
 When the message flows through an action-command, the action is executed.
 
-When it flows through a condition-command, a test is performed. If the test fails, the flow jumps to the next comma `,` or the next semicolon `;`.
+When it flows through a condition-command, a test is performed. If the test fails, the flow jumps **after** the next comma `,` or semicolon `;`.
 
-* Semicolon `;` stops skipping (end if)
-* Comma `,` skips conditional (or)
+* Semicolon `;` stops skipping
+* Comma `,` skips conditionals
 
 Semicolon `;` indicates the end of an *IF-THEN* structure.
 
@@ -183,27 +183,37 @@ Comma `,` can be used to introduce *OR* connectives in conditional expressions.
 ```
 + a-true , + b-true > ok ;
 ```
-* skips b-true
+* a-true = executes comma `,` = skips b-true
 * sends ok
 
 ```
 + a-false , + b-true > ok ;
 ```
-* jumps to ","
-* sends ok
+* a-false = jumps after comma `,`
+* b-true = sends ok
 
 ```
 + a-true , + b-false > ok ;
 ```
-* skips b-false
+* a-true = executes comma `,` = skips b-false
 * sends ok
 
 ```
 + a-false , + b-false > ok ;
 ```
-* jumps to ","
-* jumps to ";"
+* a-false = jumps after comma `,`
+* b-false = jumps after semicolon `;`
 * does not send ok
+
+So.
+
+Comma is OR. Semicolon is ENDIF. In this example:
+
+```
++C1 +C2 , +C3 +C4 > True ; 
+```
+`True` is send if `C1` and `C2` are true, or if `C3` and `C4` are true.
+
 
 ### Variables
 

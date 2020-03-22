@@ -1,9 +1,9 @@
 
-![](http://noisett.lang.free.fr/birdy.png)
+![](http://noisett.lang.free.fr/BirdyVM.png)
 
-# Birdy
+# BirdyVM
 
-Birdy is
+BirdyVM is
 * a message oriented virtual machine,
 * a real-time **thinkbot/chatbot** engine,
 * designed to be as small as possible, while still being powerful and easy.
@@ -59,20 +59,20 @@ Here is a complete list of the 32 characters with special meaning.
 
 ### Pub/sub
 
-A Birdy program is made of a lot of very small [teleo-reactive](http://teleoreactiveprograms.net/?page_id=8) agents. Let's call these agents "units".
+A BirdyVM program is made of a lot of very small [teleo-reactive](http://teleoreactiveprograms.net/?page_id=8) agents. Let's call these agents "units".
 
 During the execution of the VM, units continuously receive and send messages to one another, asynchronously, and anonymously.
 
 The Wikipedia [article](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) about the pub/sub pattern gives the following definition.
 > In software architecture, publish/subscribe is a messaging pattern where senders of messages, called publishers, do not program the messages to be sent directly to specific receivers, called subscribers, but instead categorize published messages into classes without knowledge of which subscribers, if any, there may be. Similarly, subscribers express interest in one or more classes and only receive messages that are of interest, without knowledge of which publishers, if any, there are.
 
-This pattern is usually employed as glue between software components. But in Birdy, pub/sub is the core architecture, where units are activated only when they receive a message.
+This pattern is usually employed as glue between software components. But in BirdyVM, pub/sub is the core architecture, where units are activated only when they receive a message.
 
 ## Structure of a unit definition
 
 ### Command format
 
-A unit definition is mainly a succession of **commands**. Commands are the smallest building blocks of Birdy programs.
+A unit definition is mainly a succession of **commands**. Commands are the smallest building blocks of BirdyVM programs.
 
 A command starts with a special character (the instruction), followed by a string of non-special characters (the argument). For example in the following code line:
 
@@ -162,9 +162,9 @@ The character immediately following `#` and `$` is the **variable identifier**. 
 
 ### Parentheses in glob patterns
 
-Pattern matching in Birdy works almost like file glob patterns, with `#1` instead of `*`. But there's a key difference.
+Pattern matching in BirdyVM works almost like file glob patterns, with `#1` instead of `*`. But there's a key difference.
 
-Pattern matching in Birdy is **parentheses-sensitive**. If an opening parenthesis is captured, the corresponding closing parenthesis must also be captured. If an opening parenthesis is not captured, the corresponding closing parenthesis cannot be captured.
+Pattern matching in BirdyVM is **parentheses-sensitive**. If an opening parenthesis is captured, the corresponding closing parenthesis must also be captured. If an opening parenthesis is not captured, the corresponding closing parenthesis cannot be captured.
 
 In other words, if a capture has parentheses, they are necessarily balanced.
 

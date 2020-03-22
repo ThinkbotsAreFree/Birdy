@@ -148,7 +148,7 @@ parser = /*
         peg$c4 = peg$literalExpectation("|", false),
         peg$c5 = function(ic, com) {
         	return {
-            	outputChannel: ic,
+            	initInput: ic,
                 commands: com
             };
         },

@@ -8,12 +8,12 @@ Birdy is
 * a real-time **chatbot engine**,
 * designed to be as small as possible while still being powerful and easy to use.
 
-A declarative language, based on special characters instead of keywords, is used to describe a population of nodes called "peers", which communicate asynchronously through a **publish/subscribe** system.
+A declarative language, based on special characters instead of keywords, is used to describe a population of nodes called "units", which communicate asynchronously through a **publish/subscribe** system.
 
 Here is a complete list of the 32 characters with special meaning.
 
 ```
-    |       peer
+    |       unit
 
     §       insert sender signature
     _       set my signature
@@ -45,7 +45,7 @@ Here is a complete list of the 32 characters with special meaning.
     {       subscribe
     }       unsubscribe
 
-    *       create peer
+    *       create unit
 
     ~       die
 
@@ -59,20 +59,20 @@ Here is a complete list of the 32 characters with special meaning.
 
 ### Pub/sub
 
-A Birdy program is made of a lot of very small reactive agents. Let's call these agents "peers".
+A Birdy program is made of a lot of very small reactive agents. Let's call these agents "units".
 
-During the execution of the VM, peers continuously receive and send messages to one another, asynchronously, and anonymously.
+During the execution of the VM, units continuously receive and send messages to one another, asynchronously, and anonymously.
 
 The Wikipedia [article](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) about the pub/sub pattern gives the following definition.
 > In software architecture, publish/subscribe is a messaging pattern where senders of messages, called publishers, do not program the messages to be sent directly to specific receivers, called subscribers, but instead categorize published messages into classes without knowledge of which subscribers, if any, there may be. Similarly, subscribers express interest in one or more classes and only receive messages that are of interest, without knowledge of which publishers, if any, there are.
 
 This pattern is usually employed as glue between software components. But in Birdy, pub/sub is the core architecture.
 
-## Structure of a peer definition
+## Structure of a unit definition
 
 ### Command format
 
-A peer definition is mainly a succession of **commands**. Commands are the smallest building blocks of Birdy programs.
+A unit definition is mainly a succession of **commands**. Commands are the smallest building blocks of Birdy programs.
 
 A command starts with a special character (the instruction), followed by a string of non-special characters (the argument). For example in the following code line:
 
@@ -87,14 +87,14 @@ We have 3 commands:
 
 - `> hello world` -> publish a "hello world" message
 
-### Peer definition format
+### Unit definition format
 
-A peer definition starts with a vertical bar `|` immediately followed by a channel pattern, followed by commands. The following line is a valid and complete definition of a peer.
+A unit definition starts with a vertical bar `|` immediately followed by a channel pattern, followed by commands. The following line is a valid and complete definition of a unit.
 ```
 | from user + hi there @ to user > hello world
 ```
 
-At startup, this peer is initially configured to receive all messages published on the `from user` channel.
+At startup, this unit is initially configured to receive all messages published on the `from user` channel.
 
 ### Escape blocks
 
@@ -112,19 +112,19 @@ Square brackets are nestable, in which case they have to be balanced.
 ```
 This would publish `You can nest [balanced] square brackets too`, where only the outer square brackets are removed.
 
-### Signature of a peer
+### Signature of a unit
 
-The signature of a peer is like a name, except it's not necessarily unique. It's a meta information that is always transfered with a message.
+The signature of a unit is like a name, except it's not necessarily unique. It's a meta information that is always transfered with a message.
 
-You set a peer's signature with the `_` command.
+You set a unit's signature with the `_` command.
 ```
 _ Zorro > Hey Tornado
 ```
-The peers that receive this message can insert the message sender signature with the `§` function.
+The units that receive this message can insert the message sender signature with the `§` function.
 ```
 + Hey Tornado > looks like § lost his brave horse
 ```
-This peer would send `looks like Zorro lost his brave horse`.
+This unit would send `looks like Zorro lost his brave horse`.
 
 ### Comments
 
@@ -132,7 +132,7 @@ Comments can be placed anywhere between double quotes `"..."`.
 
 Comments are ignored by the VM.
 
-## Execution of a peer's program
+## Execution of a unit's program
 
 ### Command categories
 
@@ -152,7 +152,7 @@ In arguments:
 ```
 + user wants #1 > is $1 available
 ```
-If a peer with this code receives a message "user wants another topic", it will publish a message "is another topic available".
+If a unit with this code receives a message "user wants another topic", it will publish a message "is another topic available".
 
 The character immediately following `#` and `$` is the **variable identifier**. It can be any non-special character, like a digit or a letter. Yes I know, it's only 1 character.
 
@@ -164,11 +164,11 @@ Pattern matching in Birdy is **parentheses-sensitive**. If an opening parenthesi
 
 In other words, if a capture has parentheses, they are necessarily balanced.
 
-This important feature makes structured messaging possible and easy: since peers can manipulate and send s-expression based messages, any kind of data structure can be expressed.
+This important feature makes structured messaging possible and easy: since units can manipulate and send s-expression based messages, any kind of data structure can be expressed.
 
 ### Control flow
 
-When a peer receives a message, the message goes through all of the peer's commands, one by one, in order.
+When a unit receives a message, the message goes through all of the unit's commands, one by one, in order.
 
 When the message flows through an action-command, the action is executed.
 
@@ -189,7 +189,7 @@ Comma is OR. Semicolon is ENDIF. In this example:
 
 ### Variables
 
-A string captured with `#x` is in fact stored in the variable `x`. Variables are local to a peer. There are several ways to manipulate values stored in variables.
+A string captured with `#x` is in fact stored in the variable `x`. Variables are local to a unit. There are several ways to manipulate values stored in variables.
 
 Naturally, you can set the value of a variable.
 ```
@@ -223,19 +223,19 @@ This will send `it is longer` only if the variable `x` contains `my value is lon
 
 #### Global variables
 
-For convenience (or rather for potential use cases I can't think of right now), peers can read (insert) global variables with the function `¤1`, and write (assign) global variables with the command `:1`. Since variable identifiers are 1 character long, there's only a limited number of them. They should be used rarely, maybe as a very general blackboard, or as configuration panel.
+For convenience (or rather for potential use cases I can't think of right now), units can read (insert) global variables with the function `¤1`, and write (assign) global variables with the command `:1`. Since variable identifiers are 1 character long, there's only a limited number of them. They should be used rarely, maybe as a very general blackboard, or as a configuration panel.
 
-If two peers assign a value to the same global variable simultaneously, nothing happens: value of the global variable remains unchanged.
+If two units assign a value to the same global variable simultaneously, nothing happens: the value of the global variable remains unchanged.
 
 ### State persistence
 
-The whole state of a peer remains unchanged between the receptions of 2 messages. The emission channel and variables' content won't be deleted after a message has been treated.
+The whole state of a unit remains unchanged between the receptions of 2 messages. The emission channel and variables' content won't be deleted after a message has been treated.
 ```
 | global
 + save #1 > done
 + give it > I saved $1
 ```
-After this peer receives a `save foo` message, the variable `#1` will contain `foo`. Then, if it receives a `give it` message, it will publish `I saved foo`.
+After this unit receives a `save foo` message, the variable `#1` will contain `foo`. Then, if it receives a `give it` message, it will publish `I saved foo`.
 
 ## The network
 
@@ -243,63 +243,63 @@ After this peer receives a `save foo` message, the variable `#1` will contain `f
 
 Messages are published on channels. Channels are simply **strings**.
 
-Peers receive only messages that were published on channels they subscribed to.
+Units receive only messages that were published on channels they subscribed to.
 
-To subscribe to a new channel, a peer must execute the *subscribe* command `{`. To unsubscribe, the *unsubscribe* command `}` must be executed. Obviously, curly braces don't have to be balanced, because these two commands are independent.
+To subscribe to a new channel, a unit must execute the *subscribe* command `{`. To unsubscribe, the *unsubscribe* command `}` must be executed. Obviously, curly braces don't have to be balanced, because these two commands are independent.
 ```
 | global + please listen to #1 { dynamic.&1
 ```
-At startup, this peer is configured to listen to the `global` channel.
+At startup, this unit is configured to listen to the `global` channel.
 
 If it receives a `please listen to subch1` message, it will subscribe to the `dynamic.subch1` channel, and will start receiving messages published on this channel too.
 
 ### Channel patterns
 
-It is possible to configure a peer to listen to every channel that matches a pattern.
+It is possible to configure a unit to listen to every channel that matches a pattern.
 
 For example, `{ ch.#A` means "subscribe to every channel that matches `ch.#A`". With this subscription, when a message is received on channel `ch.bar`, the variable `A` will contain `bar`.
 
-### Peers creation
+### Units creation
 
-The *create peer* command `*` takes its argument and makes a new peer out of it.
+The *create unit* command `*` takes its argument and makes a new unit out of it.
 ```
 | global
 + make greeter #1
 * [| from user + ]$1[ > hello]
 ```
-When this peer receives a `make greeter hey` message, it will create the following peer:
+When this unit receives a `make greeter hey` message, it will create the following unit:
 ```
 | from user + hey > hello
 ```
-Notice how I didn't escape the `$1` value insertion in the *create peer* command.
+Notice how I didn't escape the `$1` value insertion in the *create unit* command.
 
-### Peers death
+### Units death
 
-The *die* command `~` allows a peer to delete itself.
+The *die* command `~` allows a unit to delete itself.
 
-The argument of the *die* command is the "testament" of the peer: it is a message that will be emitted just before the peer is deleted.
+The argument of the *die* command is the "testament" of the unit: it is a message that will be emitted just before the unit is deleted.
 
 ## Commands and functions detailed
 
 ### § insert sender signature
 
-The *insert sender signature* function returns the signature of the peer who sent the current message.
+The *insert sender signature* function returns the signature of the unit who sent the current message.
 
 ### _ set my signature
 
-The *set my signature* command is used to choose a string as the signature of the peer.
+The *set my signature* command is used to choose a string as the signature of the unit.
 
 ### ° insert fresh ID
 
 The *insert fresh ID* function inserts an auto-increment ID number, made of digits only. Its purpose is to create new vocabulary.
 
-### ¤ insert global value
+### ¤1 insert global value
 
 The *insert global value* function insert the current value of a global variable.
 
-### : set global value
+### :1 set global value
 
-The *set global value* command tries to assign a value to a global variable. It can fail if several peers try to do it simultaneously, in which case nothing happens.
+The *set global value* command tries to assign a value to a global variable. It can fail if several units try to do it simultaneously, in which case nothing happens.
 
 ### #1 capture value
 
@@ -349,11 +349,19 @@ The *if message doesn't match* command is a condition-command that succeeds only
 
 If it fails, the wildcards used in the pattern will contain captured strings.
 
+### ; stop skipping
+
+The *stop skipping* command marks then end of a conditional expression.
+
+### , skip conditions
+
+The *skip conditions* command skips condition-commands.
+
 ### @ on channel
 
-The *on channel* command modifies the current **emission channel** of the peer.
+The *on channel* command modifies the current **emission channel** of the unit.
 
-By default, a peer publishes its messages on the `global` channel.
+By default, a unit publishes its messages on the `global` channel.
 
 A message can only be published on 1 channel.
 
@@ -361,31 +369,31 @@ A message can only be published on 1 channel.
 
 The *publish* command publishes a message on the current emission channel.
 
-All peers that subscribed to this channel will receive the message.
+All units that subscribed to this channel will receive the message.
 
 ### < reply
 
-The *reply* command sends a message only to the peer that published the received message.
+The *reply* command sends a message only to the unit that published the received message.
 
 ### ^ send to self
 
-The *send to self* command sends a message only to the sending peer.
+The *send to self* command sends a message only to the sending unit.
 
 ### { subscribe
 
-The *subscribe* command makes the peer listen to a channel, or to every channel matching a pattern.
+The *subscribe* command makes the unit listen to a channel, or to every channel matching a pattern.
 
 ### } unsubscribe
 
-The *unsubscribe* command makes the peer stop listening to a channel, or to every channel matching a pattern.
+The *unsubscribe* command makes the unit stop listening to a channel, or to every channel matching a pattern.
 
-### * create peer
+### * create unit
 
-The *create peer* command creates a new peer. The argument will be the new peer's  source code.
+The *create unit* command creates a new unit. The argument will be the new unit's  source code.
 
 ### ~ die
 
-The *die* command deletes the peer which executes it. The argument will be the last message published by the peer before it disappears.
+The *die* command deletes the unit which executes it. The argument will be the last message published by the unit before it disappears.
 
 
 

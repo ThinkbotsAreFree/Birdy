@@ -66,7 +66,7 @@ During the execution of the VM, units continuously receive and send messages to 
 The Wikipedia [article](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) about the pub/sub pattern gives the following definition.
 > In software architecture, publish/subscribe is a messaging pattern where senders of messages, called publishers, do not program the messages to be sent directly to specific receivers, called subscribers, but instead categorize published messages into classes without knowledge of which subscribers, if any, there may be. Similarly, subscribers express interest in one or more classes and only receive messages that are of interest, without knowledge of which publishers, if any, there are.
 
-This pattern is usually employed as glue between software components. But in Birdy, pub/sub is the core architecture.
+This pattern is usually employed as glue between software components. But in Birdy, pub/sub is the core architecture, where units are activated only when they receive a message.
 
 ## Structure of a unit definition
 
@@ -205,15 +205,15 @@ You can append (concatenate) a new value to a variable.
 ```
 &x is longer
 ```
-Now `x` contains the value `my new value is longer`.
+Now `x` contains the value `my new value is the longest value`.
 
-You can also replace all occurences of a substring, using an extra character `/` between the old substring and the new substring.
+You can also replace all occurences of a substring, using a slash character `/` between the old substring and the new substring.
 ```
 %x value / name
 ```
-Now `x` contains the value `my new name is longer`.
+Now `x` contains the value `my new name is the longest name`.
 
-There's also a powerful command that lets you **execute a value**, as if it was a fragment of code. For example, say a variable `y` contains `@ user > my dog likes`.
+There's also a powerful command that lets you **execute a value** contained in a local variable, as if it was a fragment of code. For example, say a variable `y` contains `@ user > my dog likes`, then:
 ```
 €y my cat
 ```
@@ -229,7 +229,7 @@ This will send `it is longer` only if the variable `x` contains `my value is lon
 
 For convenience (or rather for potential use cases I can't think of right now), units can read (insert) global variables with the function `¤1`, and write (assign) global variables with the command `:1`.
 
-In cas of collision, if two units assign a value to the same global variable simultaneously, nothing happens: the value of the global variable remains unchanged.
+In case of collision, if two units assign a value to the same global variable simultaneously, nothing happens: the value of the global variable remains unchanged.
 
 #### Indirect variable access
 
@@ -265,7 +265,7 @@ Units receive only messages that were published on channels they subscribed to.
 
 To subscribe to a new channel, a unit must execute the *subscribe* command `{`. To unsubscribe, the *unsubscribe* command `}` must be executed. Obviously, curly braces don't have to be balanced, because these two commands are independent.
 ```
-| global + please listen to #1 { dynamic.&1
+| global + please listen to #1 { dynamic.$1
 ```
 At startup, this unit is configured to listen to the `global` channel.
 
@@ -276,6 +276,8 @@ If it receives a `please listen to subch1` message, it will subscribe to the `dy
 It is possible to configure a unit to listen to every channel that matches a pattern.
 
 For example, `{ ch.#A` means "subscribe to every channel that matches `ch.#A`". With this subscription, when a message is received on channel `ch.bar`, the variable `A` will contain `bar`.
+
+To unsubscribe from a channel pattern, the exact same pattern must be given as argument, like this: `} ch.#A`
 
 ### Units creation
 
@@ -298,26 +300,6 @@ The *die* command `~` allows a unit to delete itself.
 The argument of the *die* command is the "testament" of the unit: it is a message that will be emitted just before the unit is deleted.
 
 ## Commands and functions detailed
-
-### § insert sender signature
-
-The *insert sender signature* function returns the signature of the unit who sent the current message.
-
-### _ set my signature
-
-The *set my signature* command is used to choose a string as the signature of the unit.
-
-### ° insert fresh ID
-
-The *insert fresh ID* function inserts an auto-increment ID number, made of digits only. Its purpose is to create new vocabulary.
-
-### ¤1 insert global value
-
-The *insert global value* function insert the current value of a global variable.
-
-### :1 set global value
-
-The *set global value* command tries to assign a value to a global variable. It can fail if several units try to do it simultaneously, in which case nothing happens.
 
 ### #1 capture value
 
@@ -373,7 +355,7 @@ The *stop skipping* command marks then end of a conditional expression.
 
 ### , skip conditions
 
-The *skip conditions* command skips condition-commands.
+The *skip conditions* command skips condition-commands, acting as a logical OR.
 
 ### @ on channel
 
@@ -412,6 +394,26 @@ The *create unit* command creates a new unit. The argument will be the new unit'
 ### ~ die
 
 The *die* command deletes the unit which executes it. The argument will be the last message published by the unit before it disappears.
+
+### § insert sender signature
+
+The *insert sender signature* function returns the signature of the unit who sent the current message.
+
+### _ set my signature
+
+The *set my signature* command is used to choose a string as the signature of the unit.
+
+### ° insert fresh ID
+
+The *insert fresh ID* function inserts an auto-increment ID number, made of digits only. Its purpose is to create new vocabulary.
+
+### ¤1 insert global value
+
+The *insert global value* function insert the current value of a global variable.
+
+### :1 set global value
+
+The *set global value* command tries to assign a value to a global variable. It can fail if several units try to do it simultaneously, in which case nothing happens.
 
 
 

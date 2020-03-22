@@ -1,0 +1,38 @@
+
+
+body {
+    background: #222;
+    color: #ccc;
+}
+
+
+#banner {
+    max-width: 100%;
+}
+
+
+textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 10em;
+    resize: vertical;
+    background: #333;
+    color: #ccc;
+    border: none;
+    outline: none;
+    font-family: Consolas, monospace;
+}
+
+
+.right {
+    text-align: right;
+}
+
+
+button {
+    background: #333;
+    border: 2px solid #777;
+    border-radius: 4px;
+    color: #ccc;
+    margin-top: 0.5em;
+}

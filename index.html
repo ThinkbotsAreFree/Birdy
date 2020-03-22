@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>BirdyVM</title>
+    <link rel="stylesheet" href="normalize.css" type="text/css">
+    <link rel="stylesheet" href="main.css" type="text/css">
+</head>
+
+<body>
+    <img id="banner" src="birdy.png">
+
+    <textarea id="editor"></textarea>
+    <button onclick="sys.parseEditor()">Parse</button>
+    <button onclick="sys.step()">Step</button>
+    <button onclick="sys.run()">Run</button>
+
+    <div class="right">Output</div>
+    <textarea id="output"></textarea>
+
+    <script src="parser.js"></script>
+    <script src="birdy.js"></script>
+</body>
+
+</html>

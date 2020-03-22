@@ -62,12 +62,12 @@ sys.parseEditor = function () {
 
     output.value = '';
     for (let u in sys.unit) {
-        output.value += "\nID→"+sys.unit[u].id+" | OutChannel→"+sys.unit[u].outChannel+'\n';
+        output.value += "\n[ID]→ "+sys.unit[u].id+" [OutChannel]→ "+sys.unit[u].outChannel+'\n';
         sys.unit[u].AST.commands.forEach(command => {
-            output.value += "Com→ "+command.com;
-            if (command.id) output.value += " | Var→ "+command.id;
-            if (Array.isArray(command.arg)) output.value += " | Arg→ "+command.arg.join(", ");
-            else if (command.arg) output.value += " | Old→ "+command.arg.old.join(", ")+" | New→ "+command.arg.new.join(", ");
+            output.value += "[Com]→ "+command.com;
+            if (command.id) output.value += " [Var]→ "+command.id;
+            if (Array.isArray(command.arg)) output.value += " [Arg]→ "+command.arg.join(", ");
+            else if (command.arg) output.value += " [Old]→ "+command.arg.old.join(", ")+" [New]→ "+command.arg.new.join(", ");
             output.value += "\n";
         });
     }

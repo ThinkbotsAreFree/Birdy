@@ -24,6 +24,11 @@ textarea {
 }
 
 
+#output {
+    min-height: 50vh;
+}
+
+
 .right {
     text-align: right;
 }

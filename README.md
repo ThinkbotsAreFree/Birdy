@@ -213,17 +213,23 @@ You can also replace all occurences of a substring, using a slash character `/` 
 ```
 Now `x` contains the value `my new name is the longest name`.
 
-There's also a powerful command that lets you **execute a value** contained in a local variable, as if it was a fragment of code. For example, say a variable `y` contains `@ user > my dog likes`, then:
-```
-€y my cat
-```
-This would choose `user` as emission channel and send the message `my dog likes my cat`. Executing values can contain executing values.
-
-Variables can be tested by conditionals just like the received message.
+Variables can be **tested by conditionals** just like the received message.
 ```
 ?x my value is #w > it is $w
 ```
 This will send `it is longer` only if the variable `x` contains `my value is longer`.
+
+#### Value execution
+
+There's also a powerful command that lets you **execute a value** contained in a local variable, as if it was a fragment of code. For example, say a variable `y` contains `@ user > my dog likes`, then:
+```
+€y my cat
+```
+This would choose `user` as emission channel and send the message `my dog likes my cat`.
+
+Executing values can contain executing values, which means that it is *possible* to express **recursive algorithms**.
+
+While powerful, this feature opens the door to potential infinite loops. To prevent them, a maximum number of execution steps is defined in the configuration file (default 1000). If a unit reach the maximum number of steps, it is inhibited and marked as bugged.
 
 #### Global variables
 
@@ -319,11 +325,11 @@ The *append to value* command concatenates a string to the value in a variable.
 
 ### %1 / replace in value
 
-The *replace in value* performs substring substitution in a variable.
+The *replace in value* command performs substring substitution in a variable.
 
 ### €1 execute value
 
-The *execute value* evaluates a value as if it was a fragment of code.
+The *execute value* command evaluates a value as if it was a fragment of code.
 
 ### ?1 if value matches
 

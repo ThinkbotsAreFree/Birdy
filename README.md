@@ -229,7 +229,7 @@ This would choose `user` as emission channel and send the message `my dog likes 
 
 Executing values can contain executing values, which means that it is *possible* to express **recursive algorithms**.
 
-While powerful, this feature opens the door to potential infinite loops. To prevent them, a maximum number of execution steps is defined in the configuration file (default 1000). If a unit reach the maximum number of steps, it is inhibited and marked as bugged.
+While powerful, this feature opens the door to potential infinite loops. To prevent them, a maximum number of execution steps is defined in the configuration file (default 1000). If a unit reaches the maximum number of steps, it is inhibited and marked as having unwanted behavior.
 
 #### Global variables
 

@@ -178,8 +178,8 @@ When the message flows through an action-command, the action is executed.
 
 When it flows through a condition-command, a test is performed. If the test fails, the flow jumps **after** the next comma `,` or **after** the next semicolon `;`.
 
-* Semicolon `;` is a command that stops skipping commands
-* Comma `,` is a command that starts skipping condition-commands
+* Semicolon `;` stops skipping commands
+* Comma `,` starts skipping condition-commands
 
 Semicolon `;` indicates the end of an *IF-THEN* structure. Comma `,` can be used to introduce *OR* connectives in conditional expressions.
 
@@ -203,7 +203,7 @@ This would assign the string `my new value` to the variable `x`.
 
 You can append (concatenate) a new value to a variable.
 ```
-&x is longer
+&x is the longest value
 ```
 Now `x` contains the value `my new value is the longest value`.
 

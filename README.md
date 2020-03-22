@@ -166,7 +166,7 @@ When a peer receives a message, the message goes through all of the peer's comma
 
 When the message flows through an action-command, the action is executed.
 
-When it flows through a condition-command, a test is performed. If the test fails, the flow jumps **after** the next comma `,` or semicolon `;`.
+When it flows through a condition-command, a test is performed. If the test fails, the flow jumps **after** the next comma `,` or **after** the next semicolon `;`.
 
 * Semicolon `;` stops skipping
 * Comma `,` skips conditionals
@@ -212,7 +212,7 @@ Comma is OR. Semicolon is ENDIF. In this example:
 ```
 +C1 +C2 , +C3 +C4 > True ; 
 ```
-`True` is send if `C1` and `C2` are true, or if `C3` and `C4` are true.
+`True` is sent if `C1` and `C2` are true, or if `C3` and `C4` are true.
 
 
 ### Variables

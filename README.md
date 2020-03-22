@@ -174,44 +174,10 @@ When the message flows through an action-command, the action is executed.
 
 When it flows through a condition-command, a test is performed. If the test fails, the flow jumps **after** the next comma `,` or **after** the next semicolon `;`.
 
-* Semicolon `;` is a command that stops skipping
-* Comma `,` is a command that skips condition-commands
+* Semicolon `;` is a command that stops skipping commands
+* Comma `,` is a command that starts skipping condition-commands
 
-Semicolon `;` indicates the end of an *IF-THEN* structure.
-
-```
-+ if1 + if2 @ ch1 > msg1 ; + if3 + if4 > msg2 ;
-```
-If the `+ if1` test fails, the control jumps directly to the `+ if 3` test. Then, if both `+ if3` and `+ if4` succeed, the `> msg2` action-command is executed.
-
-Comma `,` can be used to introduce *OR* connectives in conditional expressions.
-
-```
-+ a-true , + b-true > ok ;
-```
-* a-true = executes comma `,` = skips b-true
-* sends ok
-
-```
-+ a-false , + b-true > ok ;
-```
-* a-false = jumps after comma `,`
-* b-true = sends ok
-
-```
-+ a-true , + b-false > ok ;
-```
-* a-true = executes comma `,` = skips b-false
-* sends ok
-
-```
-+ a-false , + b-false > ok ;
-```
-* a-false = jumps after comma `,`
-* b-false = jumps after semicolon `;`
-* does not send ok
-
-So.
+Semicolon `;` indicates the end of an *IF-THEN* structure. Comma `,` can be used to introduce *OR* connectives in conditional expressions.
 
 Comma is OR. Semicolon is ENDIF. In this example:
 

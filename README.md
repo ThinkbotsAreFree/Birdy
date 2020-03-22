@@ -166,19 +166,19 @@ When a peer receives a message, the message goes through all of the peer's comma
 
 When the message flows through an action-command, the action is executed.
 
-When it flows through a condition-command, a test is performed. If the test fails, the flow jumps to the next '`,`' or the next '`;`'.
+When it flows through a condition-command, a test is performed. If the test fails, the flow jumps to the next comma `,` or the next semicolon `;`.
 
-* '`;`' stops skipping (end if)
-* '`,`' skips conditional (or)
+* Semicolon `;` stops skipping (end if)
+* Comma `,` skips conditional (or)
 
-'`;`' indicates the end of an *IF-THEN* structure.
+Semicolon `;` indicates the end of an *IF-THEN* structure.
 
 ```
 + if1 + if2 @ ch1 > msg1 ; + if3 + if4 > msg2 ;
 ```
 If the `+ if1` test fails, the control jumps directly to the `+ if 3` test. Then, if both `+ if3` and `+ if4` succeed, the `> msg2` action-command is executed.
 
-'`,`' can be used to introduce *OR* connectives in conditional expressions.
+Comma `,` can be used to introduce *OR* connectives in conditional expressions.
 
 ```
 + a-true , + b-true > ok ;

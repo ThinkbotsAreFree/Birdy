@@ -5,23 +5,15 @@
 
 Birdy is
 * a message oriented virtual machine,
-* a real-time **chatbot engine**,
-* designed to be as small as possible while still being powerful and easy to use.
+* a real-time **thinkbot/chatbot** engine,
+* designed to be as small as possible, while still being powerful and easy.
 
-A declarative language, based on special characters instead of keywords, is used to describe a population of nodes called "units", which communicate asynchronously through a **publish/subscribe** system.
+A simple language, based on special characters instead of keywords, is used to describe a population of nodes called "units", which communicate asynchronously through a **publish/subscribe** system.
 
 Here is a complete list of the 32 characters with special meaning.
 
 ```
     |       unit
-
-    §       insert sender signature
-    _       set my signature
-
-    °       insert fresh ID
-
-    ¤1      insert global value
-    :1      set global value
 
     #1      capture value
     $1      insert value
@@ -31,11 +23,11 @@ Here is a complete list of the 32 characters with special meaning.
     €1      execute value
 
     ?1      if value matches
-    !1      if v doesn't match
+    !1      if value doesn't match
     +       if message matches
-    -       if msg doesn't match
-    ;       stop skipping (end if)
-    ,       skip condition-commands (or)
+    -       if message doesn't match
+    ;       end if (stop skipping commands)
+    ,       or (skip condition-commands)
 
     @       on channel
     >       publish
@@ -49,6 +41,14 @@ Here is a complete list of the 32 characters with special meaning.
 
     ~       die
 
+    §       insert sender signature
+    _       set my signature
+
+    °       insert fresh ID
+
+    ¤1      insert global value
+    :1      set global value
+
     []      escape block
     ()      structured data
 
@@ -59,7 +59,7 @@ Here is a complete list of the 32 characters with special meaning.
 
 ### Pub/sub
 
-A Birdy program is made of a lot of very small reactive agents. Let's call these agents "units".
+A Birdy program is made of a lot of very small [teleo-reactive](http://teleoreactiveprograms.net/?page_id=8) agents. Let's call these agents "units".
 
 During the execution of the VM, units continuously receive and send messages to one another, asynchronously, and anonymously.
 
@@ -126,9 +126,13 @@ The units that receive this message can insert the message sender signature with
 ```
 This unit would send `looks like Zorro lost his brave horse`.
 
+### Non-special characters
+
+Non-special characters are: uppercase and lowercase letters, digits, white-space characters, and the period.
+
 ### Comments
 
-Comments can be placed anywhere between double quotes `"..."`.
+Comments can be placed anywhere between double quotes `"..."`. They can contain any chararacter, except double quotes.
 
 Comments are ignored by the VM.
 
@@ -154,7 +158,7 @@ In arguments:
 ```
 If a unit with this code receives a message "user wants another topic", it will publish a message "is another topic available".
 
-The character immediately following `#` and `$` is the **variable identifier**. It can be any non-special character, like a digit or a letter. Yes I know, it's only 1 character.
+The character immediately following `#` and `$` is the **variable identifier**. It can be any non-special character, like a digit or a letter. Yes, it is only 1 character.
 
 ### Parentheses in glob patterns
 
@@ -223,9 +227,23 @@ This will send `it is longer` only if the variable `x` contains `my value is lon
 
 #### Global variables
 
-For convenience (or rather for potential use cases I can't think of right now), units can read (insert) global variables with the function `¤1`, and write (assign) global variables with the command `:1`. Since variable identifiers are 1 character long, there's only a limited number of them. They should be used rarely, maybe as a very general blackboard, or as a configuration panel.
+For convenience (or rather for potential use cases I can't think of right now), units can read (insert) global variables with the function `¤1`, and write (assign) global variables with the command `:1`.
 
-If two units assign a value to the same global variable simultaneously, nothing happens: the value of the global variable remains unchanged.
+In cas of collision, if two units assign a value to the same global variable simultaneously, nothing happens: the value of the global variable remains unchanged.
+
+#### Indirect variable access
+
+Syntactically, variable names can only be 1 character long. But there's a way to overcome this limitation.
+
+It is possible to access a variable indirectly, when its name is stored in another variable. For example, if the variable `i` contains the value `my variable`, then:
+```
+=$i my value
+```
+This would assign the value `my value` to the variable named `my variable`. To read a variable's value indirectly, it's just the same:
+```
+> here is $$i
+```
+This would send `here is my value`.
 
 ### State persistence
 

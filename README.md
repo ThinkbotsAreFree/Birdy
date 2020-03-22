@@ -126,6 +126,12 @@ The peers that receive this message can insert the message sender signature with
 ```
 This peer would send `looks like Zorro lost his brave horse`.
 
+### Comments
+
+Comments can be placed anywhere between double quotes `"..."`.
+
+Comments are ignored by the VM.
+
 ## Execution of a peer's program
 
 ### Command categories
@@ -306,10 +312,6 @@ Notice how I didn't escape the `$1` value insertion in the *create peer* command
 The *die* command `~` allows a peer to delete itself.
 
 The argument of the *die* command is the "testament" of the peer: it is a message that will be emitted just before the peer is deleted.
-
-### Comments
-
-Comments can be placed anywhere between double quotes `"..."`. Comments are ignored by the VM.
 
 ## Commands and functions detailed
 

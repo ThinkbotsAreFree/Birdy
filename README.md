@@ -168,8 +168,8 @@ When the message flows through an action-command, the action is executed.
 
 When it flows through a condition-command, a test is performed. If the test fails, the flow jumps **after** the next comma `,` or **after** the next semicolon `;`.
 
-* Semicolon `;` stops skipping
-* Comma `,` skips conditionals
+* Semicolon `;` is a command that stops skipping
+* Comma `,` is a command that skips conditionals
 
 Semicolon `;` indicates the end of an *IF-THEN* structure.
 

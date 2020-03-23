@@ -5,6 +5,8 @@
 const editor = document.getElementById("editor");
 const output = document.getElementById("output");
 
+output.value = '';
+
 
 
 const sys = {
@@ -50,14 +52,28 @@ Unit.prototype.publish = function (msg) {
             receiver: receiver,
             message: msg,
             signature: this.signature.slice(),
-            capture: deliveryPlan[receiver]
+            capture: deliveryPlan[receiver],
+            senderId: this.id
         });
     }
 };
 
 
 
-Unit.prototype.getTargetVariable = function(v) {
+Unit.prototype.reply = function (receiver, msg) {
+
+    sys.jobQueue.push({
+        receiver: receiver,
+        message: msg,
+        signature: this.signature.slice(),
+        capture: {},
+        senderId: this.id
+    });
+};
+
+
+
+Unit.prototype.getTargetVariable = function (v) {
 
     if (v[0] !== '$') return v;
 
@@ -66,7 +82,7 @@ Unit.prototype.getTargetVariable = function(v) {
 
 
 
-Unit.prototype.setVariables = function(vars) {
+Unit.prototype.setVariables = function (vars) {
 
     for (let v in vars) {
 
@@ -78,12 +94,12 @@ Unit.prototype.setVariables = function(vars) {
 
 
 
-Unit.prototype.performSubstitution = function(line) {
+Unit.prototype.performSubstitution = function (line) {
 
-    if (!line) return line;
+    if (!Array.isArray(line)) return line;
 
     var result = [];
-
+    
     for (let item of line) {
         if (item[0] !== '$') result.push(item);
         else result = result.concat(this.getTargetVariable(item))
@@ -132,7 +148,7 @@ sys.parseEditor = function () {
 
     sys.parsed.forEach(unitAST => sys.createUnit(unitAST));
 
-    output.value = '';
+    output.value = "parsed\n";
     if (0) for (let u in sys.unit) {
         output.value += "\n[ID]→ " + sys.unit[u].id + " [InChannel]→ " + sys.unit[u].AST.initInput.join(", ") + '\n';
         sys.unit[u].AST.commands.forEach(command => {
@@ -263,6 +279,7 @@ sys.step = function (keepRunning) {
 
     unit.receivedMessage = job.message;
     unit.senderSignature = job.signature;
+    unit.senderId = job.senderId;
 
     var todo = unit.AST.commands.slice();
 
@@ -331,6 +348,13 @@ sys.execute = {
 
 
 
+    '<': function (unit, doing) { // reply
+
+        unit.reply(unit.senderId, doing.arg);
+    },
+
+
+
     '@': function (unit, doing) { // on channel
 
         unit.outChannel = doing.arg;
@@ -346,7 +370,7 @@ sys.execute = {
 
             console.log("[outcome]", outcome);
             unit.setVariables(outcome);
-            
+
         } else {
 
             unit.skipCommands = true;
@@ -363,7 +387,7 @@ sys.execute = {
 
             console.log("[outcome]", outcome);
             unit.setVariables(outcome);
-            
+
             unit.skipCommands = true;
         }
     },
@@ -372,7 +396,6 @@ sys.execute = {
 
     '?': function (unit, doing) { // if variable matches
 
-        console.log("[doing]", doing);
         var outcome = sys.match(
             unit.localVar[unit.getTargetVariable(doing.id)],
             doing.arg
@@ -382,7 +405,7 @@ sys.execute = {
 
             console.log("[outcome]", outcome);
             unit.setVariables(outcome);
-            
+
         } else {
 
             unit.skipCommands = true;
@@ -393,7 +416,6 @@ sys.execute = {
 
     '!': function (unit, doing) { // if variable doen't match
 
-        console.log("[doing]", doing);
         var outcome = sys.match(
             unit.localVar[unit.getTargetVariable(doing.id)],
             doing.arg
@@ -403,11 +425,57 @@ sys.execute = {
 
             console.log("[outcome]", outcome);
             unit.setVariables(outcome);
-            
-        } else {
 
             unit.skipCommands = true;
         }
+    },
+
+
+
+    '=': function (unit, doing) { // set variable
+
+        unit.setVariables({ ['#'+doing.id]: doing.arg });
+    },
+
+
+
+    '&': function (unit, doing) { // append to variable
+
+        var value = unit.localVar[unit.getTargetVariable(doing.id)];
+        unit.setVariables({ ['#'+doing.id]: value.concat(doing.arg) });
+    },
+
+
+
+    '%': function (unit, doing) { // replace in variable
+
+        //console.log("[doing]", doing);
+        var value = unit.localVar[unit.getTargetVariable(doing.id)];
+
+        var pattern = doing.arg.old;
+        var v = 0;
+        var p = 0;
+        var stock = [];
+        var result = [];
+
+        while (v < value.length) {
+
+            stock.push(value[v]);
+            if (value[v] === pattern[p]) {
+                p++;
+                if (stock.length === pattern.length) {
+                    p = 0;
+                    stock = [];
+                    result = result.concat(doing.arg.new);
+                }
+            } else {
+                p = 0;
+                result = result.concat(stock);
+                stock = [];
+            }
+            v++;
+        }
+        unit.setVariables({ ['#'+doing.id]: result });
     },
 
 

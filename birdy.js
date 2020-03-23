@@ -11,13 +11,13 @@ output.value = '';
 
 const sys = {
     unit: {},
+    category: {},
     delivery: {
         children: {},
         wildcards: {},
         leaves: []
     },
     jobQueue: [],
-    speechTree: {},
     capture: {},
     delay: 500,
     todo: []
@@ -115,7 +115,9 @@ Unit.prototype.performSubstitution = function (line) {
     var result = [];
 
     for (let item of line) {
-        if (item[0] !== '$') result.push(item);
+        if (item[0] === '§') result.push(this.senderSignature);
+        else if (item[0] === '°') result.push(sys.newId());
+        else if (item[0] !== '$') result.push(item);
         else result = result.concat(this.getTargetVariable(item))
     }
 
@@ -156,7 +158,11 @@ sys.newId = (function () {
 
 sys.populate = function (source) {
 
-    parser.parse(source).forEach(unitAST => sys.createUnit(unitAST));
+    var parsed = parser.parse(source);
+    
+    parsed.units.forEach(unitAST => sys.createUnit(unitAST));
+    parsed.categories.forEach(cat => sys.createCategory(cat));
+    
 };
 
 
@@ -188,6 +194,13 @@ sys.createUnit = function (AST) {
     sys.unit[unit.id] = unit;
 
     sys.newPath(unit.id, unit.AST.initInput, sys.delivery);
+};
+
+
+
+sys.createCategory = function (def) {
+
+    sys.setLine(def.pattern, def.template, sys.category);
 };
 
 
@@ -479,6 +492,20 @@ sys.execute = {
 
 
 
+    ':': function (unit, doing) { // get match
+
+        var msg = sys.queryLine(doing.arg, sys.category);
+
+        var localVar = JSON.stringify(unit.localVar);
+        unit.setVariables(sys.capture);
+        msg = unit.performSubstitution(msg);
+        unit.localVar = JSON.parse(localVar);
+
+        unit.setVariables({ ['#' + doing.id]: msg });
+    },
+
+
+
     '&': function (unit, doing) { // append to variable
 
         var value = unit.localVar[unit.getTargetVariable(doing.id)];
@@ -558,7 +585,9 @@ sys.execute = {
 
 
 
-sys.setLine = function (line, fruit, tree) {
+sys.setLine = function (rawline, fruit, tree) {
+
+    var line = ['→'].concat(rawline).concat(['←']);
 
     var cursor = tree,
         parent;
@@ -582,10 +611,11 @@ sys.setLine = function (line, fruit, tree) {
 
 
 
-sys.removeLine = function (rawLine, tree) {
+sys.removeLine = function (rawline, tree) {
 
-    var cursor = tree,
-        line = rawLine.slice(0);
+    var line = ['→'].concat(rawline).concat(['←']);
+
+    var cursor = tree;
 
     while (line.length) {
 
@@ -632,7 +662,11 @@ sys.query = function (line, cursor) {
 
 
 
-sys.queryLine = function (line, tree) {
+sys.queryLine = function (rawline, tree) {
+
+    sys.capture = {};
+
+    var line = ['→'].concat(rawline).concat(['←']);
 
     var result = sys.query(line.slice(0), tree);
 
@@ -644,12 +678,10 @@ sys.queryLine = function (line, tree) {
 sys.match = function (message, pattern) {
 
     var tmpTree = {};
-    sys.capture = {};
 
-    sys.setLine(['→'].concat(pattern).concat(['←']), true, tmpTree);
+    sys.setLine(pattern, true, tmpTree);
 
-    console.log("[setLine]", tmpTree);
-    var result = sys.queryLine(['→'].concat(message).concat(['←']), tmpTree);
+    var result = sys.queryLine(message, tmpTree);
 
     return result ? sys.capture : false;
 }
@@ -657,15 +689,16 @@ sys.match = function (message, pattern) {
 
 
 function doTest() {
-
-    sys.unit[1].publish("this is a brand new world".split(' '));
-
+    
     /*
     console.log(sys.match(
         ["hey", "man", "foo"],
         ["hey", "man", "#n"]
     ));
     */
+
+    sys.unit[1].publish("this is a brand new world".split(' '));
+
 
     //console.log(sys.getDeliveryPlan(['a', 'b', 'c']));
 

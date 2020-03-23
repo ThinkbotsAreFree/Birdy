@@ -66,7 +66,7 @@ During the execution of the VM, units continuously receive and send messages to 
 The Wikipedia [article](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) about the pub/sub pattern gives the following definition.
 > In software architecture, publish/subscribe is a messaging pattern where senders of messages, called publishers, do not program the messages to be sent directly to specific receivers, called subscribers, but instead categorize published messages into classes without knowledge of which subscribers, if any, there may be. Similarly, subscribers express interest in one or more classes and only receive messages that are of interest, without knowledge of which publishers, if any, there are.
 
-This pattern is usually employed as glue between software components. But in BirdyVM, Pub/Sub is one of the 2 core mechanisms (the other one being a String Rewriting System).
+While the Pub/Sub pattern is often employed as glue between software components, it is one of the core mechanisms of BirdyVM, the other one being a String Rewriting System.
 
 ## Structure of a unit definition
 

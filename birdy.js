@@ -516,7 +516,6 @@ sys.execute = {
 
     '%': function (unit, doing) { // replace in variable
 
-        //console.log("[doing]", doing);
         var value = unit.localVar[unit.getTargetVariable(doing.id)];
 
         var pattern = doing.arg.old;
@@ -635,6 +634,7 @@ sys.removeLine = function (rawline, tree) {
 sys.query = function (line, cursor) {
 
     var found;
+    var level = 0;
 
     if (line.length > 1) {
 
@@ -646,6 +646,12 @@ sys.query = function (line, cursor) {
 
         if (cursor['*']) while (!found && line.length > 0) {
             if (!sys.capture[cursor['*'].item]) sys.capture[cursor['*'].item] = [];
+            while (line.length > 0 && (line[0] === '(' || line[0] === ')' || level > 0)) {
+                if (line[0] === '(') level += 1;
+                if (line[0] === ')') level -= 1;
+                sys.capture[cursor['*'].item].push(line[0]);
+                line.shift();
+            }
             sys.capture[cursor['*'].item].push(line[0]);
             line.shift();
             found = sys.query(line, cursor['*'].branch);
@@ -675,6 +681,24 @@ sys.queryLine = function (rawline, tree) {
 
 
 
+sys.captureBalanced = function() {
+
+    for (let c in sys.capture) {
+
+        var level = 0;
+        var line = sys.capture[c].slice();
+        
+        for (let l of line) {
+            if (l === '(') level += 1;
+            if (l === ')') level -= 1;
+        }
+        if (level !== 0) return false;
+    }
+    return true;
+}
+
+
+
 sys.match = function (message, pattern) {
 
     var tmpTree = {};
@@ -690,12 +714,12 @@ sys.match = function (message, pattern) {
 
 function doTest() {
     
-    /*
+    
     console.log(sys.match(
-        ["hey", "man", "foo"],
-        ["hey", "man", "#n"]
+        ["hey", '(', "man", "cat", "bar", ')', "dog", "cat", "meh", "foo"],
+        ["hey", "#p", "cat", "#z", "foo"]
     ));
-    */
+    
 
     sys.unit[1].publish("this is a brand new world".split(' '));
 

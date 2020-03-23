@@ -36,6 +36,7 @@ function Unit(AST) {
     this.localVar = {};
     this.skipCommands = false;
     this.skipConditions = false;
+    this.subscriptions = [];
 
     this.receivedMessage = [];
     this.senderSignature = [];
@@ -93,6 +94,16 @@ Unit.prototype.setVariables = function (vars) {
 
         this.localVar[target] = vars[v];
     }
+};
+
+
+
+Unit.prototype.suicide = function () {
+
+    for (let sub of this.subscriptions)
+        sys.delPath(this.id, sub, sys.delivery);
+
+    delete sys.unit[this.id];
 };
 
 
@@ -280,8 +291,12 @@ sys.buildDeliveryPlan = function (channel, node, capture) {
 
 sys.step = function (keepRunning) {
 
-    var job = sys.jobQueue.shift();
-    var unit = sys.unit[job.receiver];
+    var job, unit;
+
+    job = sys.jobQueue.shift();
+    unit = sys.unit[job.receiver];
+
+    if (!unit) return;
 
     unit.receivedMessage = job.message;
     unit.senderSignature = job.signature;
@@ -372,6 +387,7 @@ sys.execute = {
 
     '{': function (unit, doing) { // subscribe
 
+        unit.subscriptions.push(doing.arg);
         sys.newPath(unit.id, doing.arg, sys.delivery);
     },
 
@@ -379,6 +395,8 @@ sys.execute = {
 
     '}': function (unit, doing) { // subscribe
 
+        var strArg = JSON.stringify(doing.arg);
+        unit.subscriptions = unit.subscriptions.filter(sub => JSON.stringify(sub) !== strArg);
         sys.delPath(unit.id, doing.arg, sys.delivery);
     },
 
@@ -517,6 +535,21 @@ sys.execute = {
         console.log("[doing.arg.join(' ')]", doing.arg.join(' '));
         sys.populate(doing.arg.join(' '));
         console.log("[sys.unit]", sys.unit);
+    },
+
+
+
+    '_': function (unit, doing) { // set signature
+
+        unit.signature = doing.arg;
+    },
+
+
+
+    '~': function (unit, doing) { // die
+
+        if (doing.arg.length > 0) unit.publish(doing.arg);
+        unit.suicide();
     },
 
 

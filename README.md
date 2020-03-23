@@ -412,11 +412,11 @@ The *output* command sends a message to the program's standard output.
 
 ### { subscribe
 
-The *subscribe* command makes the unit listen to a channel, or to every channel matching a pattern.
+The *subscribe* command makes the unit listen to a channel, or to a channel pattern.
 
 ### } unsubscribe
 
-The *unsubscribe* command makes the unit stop listening to a channel, or to every channel matching a pattern.
+The *unsubscribe* command makes the unit stop listening to a channel, or to a channel pattern.
 
 ### * create unit
 
@@ -437,19 +437,6 @@ The *set my signature* command is used to choose a string as the signature of th
 ### ° insert fresh ID
 
 The *insert fresh ID* function inserts an auto-increment ID number, made of digits only. Its purpose is to create new vocabulary.
-
-### ¤1 insert global value
-
-The *insert global value* function insert the current value of a global variable.
-
-### :1 set global value
-
-The *set global value* command tries to assign a value to a global variable. It can fail if several units try to do it simultaneously, in which case nothing happens.
-
-
-
-
-
 
 
 

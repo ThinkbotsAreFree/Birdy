@@ -146,7 +146,7 @@ A condition-command performs a logical test. `+ - ? !` are condition-commands.
  
 An action-command performs an action. `_ : = & % € @ > < ^ { } * ~` are action-commands.
 
-A function returns a value. `§ ° ¤ $` are functions.
+A function returns a value. `§ ° $` are functions.
 
 ### Wildcards
 
@@ -186,9 +186,9 @@ Semicolon `;` indicates the end of an *IF-THEN* structure. Comma `,` can be used
 Comma is OR. Semicolon is ENDIF. In this example:
 
 ```
-+C1 +C2 , +C3 +C4 > True ; 
++ C1 + C2 , + C3 + C4 > True ; 
 ```
-`True` is sent if `C1` and `C2` are true, or if `C3` and `C4` are true.
+`True` is sent if `+ C1` and `+ C2` are true, or if `+ C3` and `+ C4` are true.
 
 
 ### Variables

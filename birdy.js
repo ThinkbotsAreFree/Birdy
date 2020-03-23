@@ -15,9 +15,9 @@ const sys = {
         leaves: []
     },
     jobQueue: [],
-    globalVar: {},
     speechTree: {},
-    capture: {}
+    capture: {},
+    delay: 500
 };
 
 
@@ -31,6 +31,8 @@ function Unit(AST) {
     this.inChannel = ['global'];
     this.outChannel = ['global'];
     this.localVar = {};
+    this.skipCommands = false;
+    this.skipConditions = false;
 
     this.receivedMessage = [];
     this.senderSignature = [];
@@ -51,6 +53,43 @@ Unit.prototype.publish = function (msg) {
             capture: deliveryPlan[receiver]
         });
     }
+};
+
+
+
+Unit.prototype.getTargetVariable = function(v) {
+
+    if (v[0] !== '$') return v;
+
+    return this.localVar[this.getTargetVariable(v.slice(1))];
+};
+
+
+
+Unit.prototype.setVariables = function(vars) {
+
+    for (let v in vars) {
+
+        var target = this.getTargetVariable(v.slice(1));
+
+        this.localVar[target] = vars[v];
+    }
+};
+
+
+
+Unit.prototype.performSubstitution = function(line) {
+
+    if (!line) return line;
+
+    var result = [];
+
+    for (let item of line) {
+        if (item[0] !== '$') result.push(item);
+        else result = result.concat(this.getTargetVariable(item))
+    }
+
+    return result;
 }
 
 
@@ -94,7 +133,7 @@ sys.parseEditor = function () {
     sys.parsed.forEach(unitAST => sys.createUnit(unitAST));
 
     output.value = '';
-    for (let u in sys.unit) {
+    if (0) for (let u in sys.unit) {
         output.value += "\n[ID]→ " + sys.unit[u].id + " [InChannel]→ " + sys.unit[u].AST.initInput.join(", ") + '\n';
         sys.unit[u].AST.commands.forEach(command => {
             output.value += "[Com]→ " + command.com;
@@ -230,15 +269,58 @@ sys.step = function (keepRunning) {
     while (todo.length > 0) {
 
         var doing = todo.shift();
-        sys.execute[doing.com[0]](unit, doing);
+
+        if (unit.skipCommands) {
+
+            if (doing.com === ';' || doing.com === ',') unit.skipCommands = false;
+
+        } else {
+
+            if (!(unit.skipConditions && sys.isCondition(doing.com))) {
+
+                doing.arg = unit.performSubstitution(doing.arg);
+
+                sys.execute[doing.com[0]](unit, doing);
+            }
+        }
     }
 
-    output.value = JSON.stringify(sys, null, 4);
+    if (keepRunning && sys.jobQueue.length > 0) {
+
+        setTimeout(function () { sys.step(true); }, sys.delay);
+    }
 }
 
 
 
+sys.isCondition = function (com) { return ['+', '-', '?', '!'].includes(com[0]); }
+
+
+
 sys.execute = {
+
+
+
+    ';': function (unit, doing) { // stop skipping commands
+
+        unit.skipCommands = false;
+        unit.skipConditions = false;
+    },
+
+
+
+    ',': function (unit, doing) { // start skipping conditions
+
+        unit.skipConditions = true;
+    },
+
+
+
+    '^': function (unit, doing) { // output
+
+        console.log("[output]", doing.arg);
+        output.value += doing.arg.join(' ') + '\n';
+    },
 
 
 
@@ -258,6 +340,74 @@ sys.execute = {
 
     '+': function (unit, doing) { // if message matches
 
+        var outcome = sys.match(unit.receivedMessage, doing.arg);
+
+        if (outcome) {
+
+            console.log("[outcome]", outcome);
+            unit.setVariables(outcome);
+            
+        } else {
+
+            unit.skipCommands = true;
+        }
+    },
+
+
+
+    '-': function (unit, doing) { // if message doesn't match
+
+        var outcome = sys.match(unit.receivedMessage, doing.arg);
+
+        if (outcome) {
+
+            console.log("[outcome]", outcome);
+            unit.setVariables(outcome);
+            
+            unit.skipCommands = true;
+        }
+    },
+
+
+
+    '?': function (unit, doing) { // if variable matches
+
+        console.log("[doing]", doing);
+        var outcome = sys.match(
+            unit.localVar[unit.getTargetVariable(doing.id)],
+            doing.arg
+        );
+
+        if (outcome) {
+
+            console.log("[outcome]", outcome);
+            unit.setVariables(outcome);
+            
+        } else {
+
+            unit.skipCommands = true;
+        }
+    },
+
+
+
+    '!': function (unit, doing) { // if variable doen't match
+
+        console.log("[doing]", doing);
+        var outcome = sys.match(
+            unit.localVar[unit.getTargetVariable(doing.id)],
+            doing.arg
+        );
+
+        if (outcome) {
+
+            console.log("[outcome]", outcome);
+            unit.setVariables(outcome);
+            
+        } else {
+
+            unit.skipCommands = true;
+        }
     },
 
 
@@ -266,11 +416,11 @@ sys.execute = {
 
 
 
-sys.setLine = function(line, fruit, tree) {
+sys.setLine = function (line, fruit, tree) {
 
     var cursor = tree,
         parent;
-    
+
     var itemId = 1;
 
     line.forEach(item => {
@@ -279,7 +429,7 @@ sys.setLine = function(line, fruit, tree) {
         if (!cursor[token]) cursor[token] = {
             branch: {},
             count: 0,
-            item: (item === '*' || item === '?') ? '#'+(itemId++) : item
+            item: (item === '*' || item === '?') ? '#' + (itemId++) : item
         };
         parent = cursor[token];
         cursor[token].count += 1;
@@ -290,7 +440,7 @@ sys.setLine = function(line, fruit, tree) {
 
 
 
-sys.removeLine = function(rawLine, tree) {
+sys.removeLine = function (rawLine, tree) {
 
     var cursor = tree,
         line = rawLine.slice(0);
@@ -318,10 +468,10 @@ sys.query = function (line, cursor) {
 
         if (cursor[line[0]]) found = sys.query(line.slice(1), cursor[line[0]].branch);
         if (found) return found;
-        
+
         if (cursor['?']) found = sys.query(line.slice(1), cursor['?'].branch);
         if (found) return found;
-        
+
         if (cursor['*']) while (!found && line.length > 0) {
             if (!sys.capture[cursor['*'].item]) sys.capture[cursor['*'].item] = [];
             sys.capture[cursor['*'].item].push(line[0]);
@@ -340,16 +490,16 @@ sys.query = function (line, cursor) {
 
 
 
-sys.queryLine = function(line, tree) {
+sys.queryLine = function (line, tree) {
 
     var result = sys.query(line.slice(0), tree);
-    
+
     return result;
 };
 
 
 
-sys.match = function(message, pattern) {
+sys.match = function (message, pattern) {
 
     var tmpTree = {};
 
@@ -364,17 +514,21 @@ sys.match = function(message, pattern) {
 
 function doTest() {
 
+    sys.unit[1].publish("this is a brand new world".split(' '));
+
     //console.log(sys.getDeliveryPlan(['a', 'b', 'c']));
+
     /*
         sys.unit[3].outChannel = ['a', 'i', 'j', 'b', 'c'];
         sys.unit[3].publish(['this', 'is', 'it']);
         console.log(sys.jobQueue);
     */
-    console.log(sys.match(
-        ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e'],
-        ['a', '#x', 'd', '#y']
-    ));
-
+    /*
+     console.log(sys.match(
+         ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e'],
+         ['a', '#x', 'd', '#y']
+     ));
+     */
 }
 
 

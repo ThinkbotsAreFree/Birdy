@@ -8,7 +8,7 @@ BirdyVM is
 * a real-time **thinkbot/chatbot** engine,
 * designed to be as small as possible, while still being powerful and easy.
 
-A concise language, based on special characters instead of keywords, is used to describe a population of nodes called **units**, which communicate asynchronously through a **publish/subscribe** system, and a set of sequence rewriting **rules**.
+A concise language, based on special characters instead of keywords, is used to describe a population of nodes called **units**, which communicate asynchronously through a **publish/subscribe** system.
 
 Here is a complete list of the 32 characters with special meaning.
 
@@ -21,7 +21,7 @@ Here is a complete list of the 32 characters with special meaning.
     #1      capture value
     $1      insert value
     =1      set value
-    :1      call rule
+    :1      call SRS
     &1      append to value
     %1 /    replace in value
     €1      execute value
@@ -66,7 +66,7 @@ During the execution of the VM, units continuously receive and send messages to 
 The Wikipedia [article](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) about the pub/sub pattern gives the following definition.
 > In software architecture, publish/subscribe is a messaging pattern where senders of messages, called publishers, do not program the messages to be sent directly to specific receivers, called subscribers, but instead categorize published messages into classes without knowledge of which subscribers, if any, there may be. Similarly, subscribers express interest in one or more classes and only receive messages that are of interest, without knowledge of which publishers, if any, there are.
 
-This pattern is usually employed as glue between software components. But in BirdyVM, pub/sub is the core architecture, where units are activated only when they receive a message.
+This pattern is usually employed as glue between software components. But in BirdyVM, Pub/Sub is one of the 2 core mechanisms (the other one being a String Rewriting System).
 
 ## Structure of a unit definition
 
@@ -309,9 +309,9 @@ The return command `^` can be used to send values to the program standard output
 
 This would output `Hi there!`
 
-## Rules
+## The String Rewriting System
 
-Rules are like user-defined functions for sequence rewriting. They're defined with a currency sign `¤` followed by a pattern, a slash character `/`, and a reponse template.
+BirdyVM has a global SRS made of **rules**. These rules are defined with a currency sign `¤` followed by a pattern, a slash character `/`, and a reponse template.
 
 Here is an example of a complete definition of a rule.
 
@@ -319,7 +319,7 @@ Here is an example of a complete definition of a rule.
 ¤ I feel very #A / Why am I so $A
 ```
 
-A call is made with the "call rule" command `:1`, which is used a bit like the "set value" command `=1`, except what gets stored is not the argument, but the response of the rule. Here is an example of match call.
+A call is made with the "call SRS" command `:1`, which is used a bit like the "set value" command `=1`, except what gets stored is not the argument, but the response of a rule to this argument. Here is an example of an SRS call.
 
 ```
 :e I feel very happy
@@ -349,9 +349,9 @@ The *insert value* funtcion inserts the value of a variable.
 
 The *set value* command assigns a value to a variable.
 
-### :1 call rule
+### :1 call SRS
 
-The *call rule* command executes a matching rule, and assigns to a variable the return value of the responding rule.
+The *call SRS* command executes a matching rule, and assigns to a variable the return value of the responding rule.
 
 ### &1 append to value
 

@@ -8,7 +8,7 @@ BirdyVM is
 * a real-time **thinkbot/chatbot** engine,
 * designed to be as small as possible, while still being powerful and easy.
 
-A simple language, based on special characters instead of keywords, is used to describe a population of nodes called "units", which communicate asynchronously through a **publish/subscribe** system.
+A simple language, based on special characters instead of keywords, is used to describe a population of nodes called **units**, which communicate asynchronously through a **publish/subscribe** system, and a set of sequence rewriting **rules**.
 
 Here is a complete list of the 32 characters with special meaning.
 
@@ -59,7 +59,7 @@ Here is a complete list of the 32 characters with special meaning.
 
 ### Pub/sub
 
-A BirdyVM program is made of a lot of very small [teleo-reactive](http://teleoreactiveprograms.net/?page_id=8) agents. Let's call these agents "units".
+A BirdyVM program is made of a lot of very small teleo-reactive agents. Let's call these agents "units".
 
 During the execution of the VM, units continuously receive and send messages to one another, asynchronously, and anonymously.
 
@@ -311,7 +311,7 @@ This would output `Hi there!`
 
 ## Rules
 
-Rules are like user-defined functions. They're defined with a currency sign `¤` followed by a pattern, a slash character `/`, and a reponse template.
+Rules are like user-defined functions for sequence rewriting. They're defined with a currency sign `¤` followed by a pattern, a slash character `/`, and a reponse template.
 
 Here is an example of a complete definition of a rule.
 

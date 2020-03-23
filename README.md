@@ -326,12 +326,14 @@ A call is made with the "get match" command `:1`, which is used a bit like the "
 ```
 The example above would store the value `Why am I so happy` in the local variable `e`.
 
-Even though this description of global categories is short, because they are a simple mechanism, their importance shouldn't be underestimated.
+Categories are inspired from chatbot engines like Rivescript or AIML, and even though this description is short (because BirdyVM's global categories are a simple mechanism), their importance shouldn't be underestimated.
 
 Indeed, units and categories are like two sides of the coin.
 
 - **Units** are *concave* lenses that tend to produce **divergent thinking** (creative, explorative, spontaneous, free-flow, non-linear).
 - **Categories** are *convex* lenses that tend to produce **convergent thinking** (efficient, focusing, accurate, logical, procedural).
+
+A well shaped program should make an appropriately balanced use of both units and categories, for they have complementary strengths.
 
 ## Commands and functions detailed
 

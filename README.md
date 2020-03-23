@@ -14,14 +14,14 @@ Here is a complete list of the 32 characters with special meaning.
 
 ```
     |       unit
-    ¤       category
+    ¤       rule
 
     ^       send to output
 
     #1      capture value
     $1      insert value
     =1      set value
-    :1      get match
+    :1      call rule
     &1      append to value
     %1 /    replace in value
     €1      execute value
@@ -307,33 +307,33 @@ The return command `^` can be used to send values to the program standard output
 + hey ^ [Hi there!]
 ```
 
-The return command `^` is also used in global categories, see below.
+This would output `Hi there!`
 
-## Global categories
+## Rules
 
-Global categories are like user-defined functions. They're defined with a currency sign `¤` followed by a pattern, a slash character `/`, and a reponse template.
+Rules are like user-defined functions. They're defined with a currency sign `¤` followed by a pattern, a slash character `/`, and a reponse template.
 
-Here is an example of a complete definition of a category.
+Here is an example of a complete definition of a rule.
 
 ```
 ¤ I feel very #A / Why am I so $A
 ```
 
-A call is made with the "get match" command `:1`, which is used a bit like the "set value" command `=1`, except what gets stored is not the argument, but the response of the category. Here is an example of match call.
+A call is made with the "call rule" command `:1`, which is used a bit like the "set value" command `=1`, except what gets stored is not the argument, but the response of the rule. Here is an example of match call.
 
 ```
 :e I feel very happy
 ```
 The example above would store the value `Why am I so happy` in the local variable `e`.
 
-Categories are inspired from chatbot engines like Rivescript or AIML, and even though this description is short (because BirdyVM's global categories are a simple mechanism), their importance shouldn't be underestimated.
+Rules are inspired from chatbot engines like Rivescript or AIML, and even though this description is short (because BirdyVM's rules are a simple mechanism), their importance shouldn't be underestimated.
 
-Indeed, units and categories are like two sides of the coin.
+Indeed, units and rules are like two sides of the coin.
 
 - **Units** are *concave* lenses that tend to produce **divergent thinking** (creative, explorative, spontaneous, free-flow, non-linear).
-- **Categories** are *convex* lenses that tend to produce **convergent thinking** (efficient, focusing, accurate, logical, procedural).
+- **Rules** are *convex* lenses that tend to produce **convergent thinking** (efficient, focusing, accurate, logical, procedural).
 
-A well shaped program should make an appropriately balanced use of both units and categories, for they have complementary strengths.
+A well shaped program should make an appropriately balanced use of both units and rules, for they have complementary strengths.
 
 ## Commands and functions detailed
 
@@ -349,9 +349,9 @@ The *insert value* funtcion inserts the value of a variable.
 
 The *set value* command assigns a value to a variable.
 
-### :1 get match
+### :1 call rule
 
-The *get match* command executes a matching global category, and assigns to a variable the return value of the responding global category.
+The *call rule* command executes a matching rule, and assigns to a variable the return value of the responding rule.
 
 ### &1 append to value
 

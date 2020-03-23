@@ -15,7 +15,9 @@ const sys = {
         leaves: []
     },
     jobQueue: [],
-    globalVar: {}
+    globalVar: {},
+    speechTree: {},
+    capture: {}
 };
 
 
@@ -28,6 +30,7 @@ function Unit(AST) {
     this.signature = [this.id];
     this.inChannel = ['global'];
     this.outChannel = ['global'];
+    this.localVar = {};
 
     this.receivedMessage = [];
     this.senderSignature = [];
@@ -35,17 +38,17 @@ function Unit(AST) {
 
 
 
-Unit.prototype.publish = function(msg) {
+Unit.prototype.publish = function (msg) {
 
     var deliveryPlan = sys.getDeliveryPlan(this.outChannel);
 
     for (let receiver in deliveryPlan) {
 
         sys.jobQueue.push({
-            receiver:  receiver,
-            message:   msg,
+            receiver: receiver,
+            message: msg,
             signature: this.signature.slice(),
-            capture:   deliveryPlan[receiver]
+            capture: deliveryPlan[receiver]
         });
     }
 }
@@ -154,7 +157,7 @@ sys.delPath = function (id, path, node) {
     }
 
     return ((Object.keys(node.children).length === 0)
-    && (Object.keys(node.wildcards).length === 0));
+        && (Object.keys(node.wildcards).length === 0));
 };
 
 
@@ -186,7 +189,7 @@ sys.buildDeliveryPlan = function (channel, node, capture) {
 
         for (let wildcard in node.wildcards) {
 
-            let found = 0+sys.deliveryFound;
+            let found = 0 + sys.deliveryFound;
             let sliceSize = 1;
 
             while (found === sys.deliveryFound && sliceSize <= channel.length) {
@@ -194,7 +197,7 @@ sys.buildDeliveryPlan = function (channel, node, capture) {
                 sys.buildDeliveryPlan(
                     channel.slice(sliceSize),
                     node.wildcards[wildcard],
-                    capture + `"${wildcard}":[${channel.slice(0, sliceSize).map(c => '"'+c+'"').join(',')}],`
+                    capture + `"${wildcard}":[${channel.slice(0, sliceSize).map(c => '"' + c + '"').join(',')}],`
                 );
                 sliceSize += 1;
             }
@@ -214,7 +217,7 @@ sys.buildDeliveryPlan = function (channel, node, capture) {
 
 
 
-sys.step = function(keepRunning) {
+sys.step = function (keepRunning) {
 
     var job = sys.jobQueue.shift();
     var unit = sys.unit[job.receiver];
@@ -239,21 +242,21 @@ sys.execute = {
 
 
 
-    '>': function(unit, doing) { // publish
+    '>': function (unit, doing) { // publish
 
         unit.publish(doing.arg);
     },
 
 
 
-    '@': function(unit, doing) { // on channel
+    '@': function (unit, doing) { // on channel
 
         unit.outChannel = doing.arg;
     },
 
 
 
-    '+': function(unit, doing) { // if message matches
+    '+': function (unit, doing) { // if message matches
 
     },
 
@@ -263,24 +266,114 @@ sys.execute = {
 
 
 
+sys.setLine = function(line, fruit, tree) {
+
+    var cursor = tree,
+        parent;
+    
+    var itemId = 1;
+
+    line.forEach(item => {
+
+        var token = (item[0] === '#') ? '*' : item;
+        if (!cursor[token]) cursor[token] = {
+            branch: {},
+            count: 0,
+            item: (item === '*' || item === '?') ? '#'+(itemId++) : item
+        };
+        parent = cursor[token];
+        cursor[token].count += 1;
+        cursor = cursor[token].branch;
+    });
+    parent.fruit = fruit;
+};
+
+
+
+sys.removeLine = function(rawLine, tree) {
+
+    var cursor = tree,
+        line = rawLine.slice(0);
+
+    while (line.length) {
+
+        if (cursor[line[0]].count == 1) {
+            delete cursor[line[0]];
+            line = [];
+        } else {
+            cursor[line[0]].count -= 1;
+            cursor = cursor[line[0]].branch;
+            line.shift();
+        }
+    }
+};
+
+
+
+sys.query = function (line, cursor) {
+
+    var found;
+
+    if (line.length > 1) {
+
+        if (cursor[line[0]]) found = sys.query(line.slice(1), cursor[line[0]].branch);
+        if (found) return found;
+        
+        if (cursor['?']) found = sys.query(line.slice(1), cursor['?'].branch);
+        if (found) return found;
+        
+        if (cursor['*']) while (!found && line.length > 0) {
+            if (!sys.capture[cursor['*'].item]) sys.capture[cursor['*'].item] = [];
+            sys.capture[cursor['*'].item].push(line[0]);
+            line.shift();
+            found = sys.query(line, cursor['*'].branch);
+        }
+        if (found) return found;
+        if (cursor['*']) return cursor['*'].fruit;
+
+        return undefined;
+    }
+    if (cursor[line[0]]) return cursor[line[0]].fruit;
+    if (cursor['?']) return cursor['?'].fruit;
+    if (cursor['*']) return cursor['*'].fruit;
+}
+
+
+
+sys.queryLine = function(line, tree) {
+
+    var result = sys.query(line.slice(0), tree);
+    
+    return result;
+};
+
+
+
 sys.match = function(message, pattern) {
 
-    return {
-        success: true,
-        capture: {}
-    };
-};
+    var tmpTree = {};
+
+    sys.setLine(pattern, true, tmpTree);
+
+    var result = sys.queryLine(message, tmpTree);
+
+    return result ? sys.capture : false;
+}
 
 
 
 function doTest() {
 
     //console.log(sys.getDeliveryPlan(['a', 'b', 'c']));
-
-    sys.unit[3].outChannel = ['a', 'i', 'j', 'b', 'c'];
-    sys.unit[3].publish(['this', 'is', 'it']);
-    console.log(sys.jobQueue);
-
+    /*
+        sys.unit[3].outChannel = ['a', 'i', 'j', 'b', 'c'];
+        sys.unit[3].publish(['this', 'is', 'it']);
+        console.log(sys.jobQueue);
+    */
+    console.log(sys.match(
+        ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e'],
+        ['a', '#x', 'd', '#y']
+    ));
 
 }
 

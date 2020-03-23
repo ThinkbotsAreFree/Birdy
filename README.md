@@ -14,10 +14,14 @@ Here is a complete list of the 32 characters with special meaning.
 
 ```
     |       unit
+    ¤       category
+
+    ^       send to output
 
     #1      capture value
     $1      insert value
     =1      set value
+    :1      get match
     &1      append to value
     %1 /    replace in value
     €1      execute value
@@ -32,7 +36,6 @@ Here is a complete list of the 32 characters with special meaning.
     @       on channel
     >       publish
     <       reply
-    ^       send to self
 
     {       subscribe
     }       unsubscribe
@@ -45,9 +48,6 @@ Here is a complete list of the 32 characters with special meaning.
     _       set my signature
 
     °       insert fresh ID
-
-    ¤1      insert global value
-    :1      set global value
 
     []      escape block
     ()      structured data
@@ -231,12 +231,6 @@ Executing values can contain executing values, which means that it is *possible*
 
 While powerful, this feature opens the door to potential infinite loops. To prevent them, a maximum number of execution steps is defined in the configuration file (default 1000). If a unit reaches the maximum number of steps, it is inhibited and marked as having unwanted behavior.
 
-#### Global variables
-
-For convenience (or rather for potential use cases I can't think of right now), units can read (insert) global variables with the function `¤1`, and write (assign) global variables with the command `:1`.
-
-In case of collision, if two units assign a value to the same global variable simultaneously, nothing happens: the value of the global variable remains unchanged.
-
 #### Indirect variable access
 
 Syntactically, variable names can only be 1 character long. But there's a way to overcome this limitation.
@@ -304,6 +298,33 @@ Notice how I didn't escape the `$1` value insertion in the *create unit* command
 The *die* command `~` allows a unit to delete itself.
 
 The argument of the *die* command is the "testament" of the unit: it is a message that will be emitted just before the unit is deleted.
+
+### Program output
+
+The return command `^` can be used to send values to the program standard output. Typically, this is how a BirdyVM program "speaks" to the user.
+
+```
++ hey ^ [Hi there!]
+```
+
+The return command `^` is also used in global categories, so below.
+
+## Global categories
+
+Global categories are like user-defined funcions. They're defined with a currency sign `¤` followed by a pattern, followed by a behavior template.
+
+Here is an example of a complete definition of a category.
+
+```
+¤ I feel very #A ^ Why am I so $A
+```
+
+A call is made with the "get match" command `:1`, which is used a bit like the "set value" command `=1`, except what gets stored is not the argument, but the return value of the reponding category. Here is an example of match call.
+
+```
+:e I feel very happy
+```
+The example above would store the value `Why am I so happy` in the local variable `e`.
 
 ## Commands and functions detailed
 

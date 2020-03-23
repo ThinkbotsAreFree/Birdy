@@ -19,7 +19,8 @@ const sys = {
     jobQueue: [],
     speechTree: {},
     capture: {},
-    delay: 500
+    delay: 500,
+    todo: []
 };
 
 
@@ -30,7 +31,7 @@ function Unit(AST) {
     this.id = sys.newId();
     this.inbox = [];
     this.signature = [this.id];
-    this.inChannel = ['global'];
+    this.inChannel = this.AST.initInput;
     this.outChannel = ['global'];
     this.localVar = {};
     this.skipCommands = false;
@@ -45,6 +46,8 @@ function Unit(AST) {
 Unit.prototype.publish = function (msg) {
 
     var deliveryPlan = sys.getDeliveryPlan(this.outChannel);
+
+    console.log("[deliveryPlan]", deliveryPlan);
 
     for (let receiver in deliveryPlan) {
 
@@ -99,7 +102,7 @@ Unit.prototype.performSubstitution = function (line) {
     if (!Array.isArray(line)) return line;
 
     var result = [];
-    
+
     for (let item of line) {
         if (item[0] !== '$') result.push(item);
         else result = result.concat(this.getTargetVariable(item))
@@ -140,13 +143,16 @@ sys.newId = (function () {
 
 
 
+sys.populate = function (source) {
+
+    parser.parse(source).forEach(unitAST => sys.createUnit(unitAST));
+};
+
+
+
 sys.parseEditor = function () {
 
-    sys.source = editor.value;
-
-    sys.parsed = parser.parse(sys.source);
-
-    sys.parsed.forEach(unitAST => sys.createUnit(unitAST));
+    sys.populate(editor.value);
 
     output.value = "parsed\n";
     if (0) for (let u in sys.unit) {
@@ -281,11 +287,13 @@ sys.step = function (keepRunning) {
     unit.senderSignature = job.signature;
     unit.senderId = job.senderId;
 
-    var todo = unit.AST.commands.slice();
+    unit.setVariables(job.capture);
 
-    while (todo.length > 0) {
+    sys.todo = unit.AST.commands.slice();
 
-        var doing = todo.shift();
+    while (sys.todo.length > 0) {
+
+        var doing = sys.todo.shift();
 
         if (unit.skipCommands) {
 
@@ -362,6 +370,20 @@ sys.execute = {
 
 
 
+    '{': function (unit, doing) { // subscribe
+
+        sys.newPath(unit.id, doing.arg, sys.delivery);
+    },
+
+
+
+    '}': function (unit, doing) { // subscribe
+
+        sys.delPath(unit.id, doing.arg, sys.delivery);
+    },
+
+
+
     '+': function (unit, doing) { // if message matches
 
         var outcome = sys.match(unit.receivedMessage, doing.arg);
@@ -434,7 +456,7 @@ sys.execute = {
 
     '=': function (unit, doing) { // set variable
 
-        unit.setVariables({ ['#'+doing.id]: doing.arg });
+        unit.setVariables({ ['#' + doing.id]: doing.arg });
     },
 
 
@@ -442,7 +464,7 @@ sys.execute = {
     '&': function (unit, doing) { // append to variable
 
         var value = unit.localVar[unit.getTargetVariable(doing.id)];
-        unit.setVariables({ ['#'+doing.id]: value.concat(doing.arg) });
+        unit.setVariables({ ['#' + doing.id]: value.concat(doing.arg) });
     },
 
 
@@ -475,7 +497,26 @@ sys.execute = {
             }
             v++;
         }
-        unit.setVariables({ ['#'+doing.id]: result });
+        unit.setVariables({ ['#' + doing.id]: result });
+    },
+
+
+
+    '€': function (unit, doing) { // execute variable
+
+        var program = unit.localVar[unit.getTargetVariable(doing.id)].concat(doing.arg);
+        var parsed = parser.parse("| dummy " + program.join(' '));
+
+        sys.todo = parsed[0].commands.concat(sys.todo);
+    },
+
+
+
+    '*': function (unit, doing) { // create units
+
+        console.log("[doing.arg.join(' ')]", doing.arg.join(' '));
+        sys.populate(doing.arg.join(' '));
+        console.log("[sys.unit]", sys.unit);
     },
 
 
@@ -570,10 +611,12 @@ sys.queryLine = function (line, tree) {
 sys.match = function (message, pattern) {
 
     var tmpTree = {};
+    sys.capture = {};
 
-    sys.setLine(pattern, true, tmpTree);
+    sys.setLine(['→'].concat(pattern).concat(['←']), true, tmpTree);
 
-    var result = sys.queryLine(message, tmpTree);
+    console.log("[setLine]", tmpTree);
+    var result = sys.queryLine(['→'].concat(message).concat(['←']), tmpTree);
 
     return result ? sys.capture : false;
 }
@@ -584,6 +627,13 @@ function doTest() {
 
     sys.unit[1].publish("this is a brand new world".split(' '));
 
+    /*
+    console.log(sys.match(
+        ["hey", "man", "foo"],
+        ["hey", "man", "#n"]
+    ));
+    */
+
     //console.log(sys.getDeliveryPlan(['a', 'b', 'c']));
 
     /*
@@ -591,12 +641,13 @@ function doTest() {
         sys.unit[3].publish(['this', 'is', 'it']);
         console.log(sys.jobQueue);
     */
+
     /*
-     console.log(sys.match(
-         ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e'],
-         ['a', '#x', 'd', '#y']
-     ));
-     */
+    console.log(sys.match(
+        ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e'],
+        ['a', '#x', 'd', '#y']
+    ));
+    */
 }
 
 

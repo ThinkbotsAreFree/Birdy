@@ -406,9 +406,9 @@ All units that subscribed to this channel will receive the message.
 
 The *reply* command sends a message only to the unit that published the received message.
 
-### ^ send to self
+### ^ output
 
-The *send to self* command sends a message only to the sending unit.
+The *output* command sends a message to the program's standard output.
 
 ### { subscribe
 

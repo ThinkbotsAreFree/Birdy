@@ -311,20 +311,27 @@ The return command `^` is also used in global categories, see below.
 
 ## Global categories
 
-Global categories are like user-defined functions. They're defined with a currency sign `¤` followed by a pattern, followed by a behavior template.
+Global categories are like user-defined functions. They're defined with a currency sign `¤` followed by a pattern, a slash character `/`, and a reponse template.
 
 Here is an example of a complete definition of a category.
 
 ```
-¤ I feel very #A ^ Why am I so $A
+¤ I feel very #A / Why am I so $A
 ```
 
-A call is made with the "get match" command `:1`, which is used a bit like the "set value" command `=1`, except what gets stored is not the argument, but the return value of the responding category. Here is an example of match call.
+A call is made with the "get match" command `:1`, which is used a bit like the "set value" command `=1`, except what gets stored is not the argument, but the response of the category. Here is an example of match call.
 
 ```
 :e I feel very happy
 ```
 The example above would store the value `Why am I so happy` in the local variable `e`.
+
+Even though this description of global categories is short, because they are a simple mechanism, their importance shouldn't be underestimated.
+
+Indeed, units and categories are like two sides of the coin.
+
+- **Units** are *concave* lenses that tend to produce **divergent thinking** (creative, explorative, spontaneous, free-flow, non-linear).
+- **Categories** are *convex* lenses that tend to produce **convergent thinking** (efficient, focusing, accurate, logical, procedural).
 
 ## Commands and functions detailed
 

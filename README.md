@@ -307,7 +307,7 @@ The return command `^` can be used to send values to the program standard output
 + hey ^ [Hi there!]
 ```
 
-The return command `^` is also used in global categories, so below.
+The return command `^` is also used in global categories, see below.
 
 ## Global categories
 

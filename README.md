@@ -311,7 +311,7 @@ The return command `^` is also used in global categories, see below.
 
 ## Global categories
 
-Global categories are like user-defined funcions. They're defined with a currency sign `¤` followed by a pattern, followed by a behavior template.
+Global categories are like user-defined functions. They're defined with a currency sign `¤` followed by a pattern, followed by a behavior template.
 
 Here is an example of a complete definition of a category.
 
@@ -319,7 +319,7 @@ Here is an example of a complete definition of a category.
 ¤ I feel very #A ^ Why am I so $A
 ```
 
-A call is made with the "get match" command `:1`, which is used a bit like the "set value" command `=1`, except what gets stored is not the argument, but the return value of the reponding category. Here is an example of match call.
+A call is made with the "get match" command `:1`, which is used a bit like the "set value" command `=1`, except what gets stored is not the argument, but the return value of the responding category. Here is an example of match call.
 
 ```
 :e I feel very happy
@@ -339,6 +339,10 @@ The *insert value* funtcion inserts the value of a variable.
 ### =1 set value
 
 The *set value* command assigns a value to a variable.
+
+### :1 get match
+
+The *get match* command executes a matching global category, and assigns to a variable the return value of the responding global category.
 
 ### &1 append to value
 

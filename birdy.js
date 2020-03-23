@@ -159,10 +159,10 @@ sys.newId = (function () {
 sys.populate = function (source) {
 
     var parsed = parser.parse(source);
-    
+
     parsed.units.forEach(unitAST => sys.createUnit(unitAST));
     parsed.categories.forEach(cat => sys.createCategory(cat));
-    
+
 };
 
 
@@ -247,6 +247,24 @@ sys.delPath = function (id, path, node) {
 
 
 
+sys.isBalanced = function (chain) {
+
+    for (let c in chain) {
+
+        var level = 0;
+        var line = chain[c].slice();
+
+        for (let l of line) {
+            if (l === '(') level += 1;
+            if (l === ')') level -= 1;
+        }
+        if (level !== 0) return false;
+    }
+    return true;
+}
+
+
+
 sys.getDeliveryPlan = function (channel) {
 
     sys.delivering = {};
@@ -279,11 +297,13 @@ sys.buildDeliveryPlan = function (channel, node, capture) {
 
             while (found === sys.deliveryFound && sliceSize <= channel.length) {
 
-                sys.buildDeliveryPlan(
-                    channel.slice(sliceSize),
-                    node.wildcards[wildcard],
-                    capture + `"${wildcard}":[${channel.slice(0, sliceSize).map(c => '"' + c + '"').join(',')}],`
-                );
+                var sliced = channel.slice(sliceSize);
+                if (sys.isBalanced(sliced))
+                    sys.buildDeliveryPlan(
+                        sliced,
+                        node.wildcards[wildcard],
+                        capture + `"${wildcard}":[${channel.slice(0, sliceSize).map(c => '"' + c + '"').join(',')}],`
+                    );
                 sliceSize += 1;
             }
         }
@@ -681,24 +701,6 @@ sys.queryLine = function (rawline, tree) {
 
 
 
-sys.captureBalanced = function() {
-
-    for (let c in sys.capture) {
-
-        var level = 0;
-        var line = sys.capture[c].slice();
-        
-        for (let l of line) {
-            if (l === '(') level += 1;
-            if (l === ')') level -= 1;
-        }
-        if (level !== 0) return false;
-    }
-    return true;
-}
-
-
-
 sys.match = function (message, pattern) {
 
     var tmpTree = {};
@@ -713,13 +715,13 @@ sys.match = function (message, pattern) {
 
 
 function doTest() {
-    
-    
+
+
     console.log(sys.match(
         ["hey", '(', "man", "cat", "bar", ')', "dog", "cat", "meh", "foo"],
         ["hey", "#p", "cat", "#z", "foo"]
     ));
-    
+
 
     sys.unit[1].publish("this is a brand new world".split(' '));
 

@@ -330,10 +330,10 @@ Rules are inspired from chatbot engines like Rivescript or AIML, and even though
 
 Indeed, units and rules are like two sides of the coin.
 
-- **Units** are *concave* lenses that tend to produce **divergent thinking** (creative, explorative, spontaneous, free-flow, non-linear).
-- **Rules** are *convex* lenses that tend to produce **convergent thinking** (efficient, focusing, accurate, logical, procedural).
+- **Units** are *concave* lenses that tend to produce **divergent thinking** (explorative, spontaneous, free-flow).
+- **Rules** are *convex* lenses that tend to produce **convergent thinking** (focusing, logical, procedural).
 
-A well shaped program should make an appropriately balanced use of both units and rules, for they have complementary strengths.
+A well shaped program should make an appropriately balanced use of both units and rules, for they have complementary strengths and use cases.
 
 ## Commands and functions detailed
 

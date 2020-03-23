@@ -8,7 +8,7 @@ BirdyVM is
 * a real-time **thinkbot/chatbot** engine,
 * designed to be as small as possible, while still being powerful and easy.
 
-A simple language, based on special characters instead of keywords, is used to describe a population of nodes called **units**, which communicate asynchronously through a **publish/subscribe** system, and a set of sequence rewriting **rules**.
+A concise language, based on special characters instead of keywords, is used to describe a population of nodes called **units**, which communicate asynchronously through a **publish/subscribe** system, and a set of sequence rewriting **rules**.
 
 Here is a complete list of the 32 characters with special meaning.
 
@@ -59,7 +59,7 @@ Here is a complete list of the 32 characters with special meaning.
 
 ### Pub/sub
 
-A BirdyVM program is made of a lot of very small teleo-reactive agents. Let's call these agents "units".
+A BirdyVM program is made of a lot of very small teleo-reactive agents, the "units".
 
 During the execution of the VM, units continuously receive and send messages to one another, asynchronously, and anonymously.
 

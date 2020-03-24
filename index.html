@@ -10,19 +10,128 @@
 </head>
 
 <body>
-    <img id="banner" src="birdy.png">
+    <div id="main">
+        <img id="banner" src="birdy.png">
+        <h1>BirdyVM</h1>
+        <div class="right">Editor</div>
+        <textarea id="editor"></textarea>
+        <button onclick="parseEditor(true)">Parse</button>
+        <button onclick="sys.step()">Step once</button>
+        <button onclick="sys.step(true)">Step while</button>
+        <button onclick="sys.step(true,true)">Run loop</button>
 
-    <textarea id="editor"></textarea>
-    <button onclick="sys.parseEditor()">Parse</button>
-    <button onclick="sys.step(false)">Step once</button>
-    <button onclick="sys.step(true)">Step while</button>
-    <button onclick="sys.run()">Run loop</button>
+        <br><br>
+        <div class="right">Output</div>
+        <textarea id="output"></textarea>
 
-    <div class="right">Output</div>
-    <textarea id="output"></textarea>
+        <br><br>
+        <div class="right">Input</div>
+        <textarea id="input"></textarea>
+        <button onclick="userPublish()">Publish</button>
 
-    <script src="parser.js"></script>
-    <script src="birdy.js"></script>
+        <script src="parser.js"></script>
+        <script src="birdy.js"></script>
+    </div>
+
+    <script>
+
+
+
+        const editor = document.getElementById("editor");
+        const output = document.getElementById("output");
+        const input = document.getElementById("input");
+
+        editor.value = "| hi there ^ hello world";
+        output.value = '';
+        input.value = `{
+    "outChannel": ["hi", "there"],
+    "signature": ["user"],
+    "message": ["go"]
+}`;
+
+
+        function parseEditor() {
+
+            sys.deliver = {};
+            sys.unit = {};
+            sys.createUnit({
+                initInput: "global",
+                commands: []
+            }, 1);
+
+
+            try {
+                sys.populate(editor.value);
+                sys.output("parser", "parsed");
+            } catch (e) {
+                sys.output("parser", e.message);
+            }
+
+            if (0) for (let u in sys.unit) {
+                output.value += "\n[ID]→ " + sys.unit[u].id + " [InChannel]→ " + sys.unit[u].AST.initInput.join(", ") + '\n';
+                sys.unit[u].AST.commands.forEach(command => {
+                    output.value += "[Com]→ " + command.com;
+                    if (command.id) output.value += " [Var]→ " + command.id;
+                    if (Array.isArray(command.arg)) output.value += " [Arg]→ " + command.arg.join(", ");
+                    else if (command.arg) output.value += " [Old]→ " + command.arg.old.join(", ") + " [New]→ " + command.arg.new.join(", ");
+                    output.value += "\n";
+                });
+            }
+
+            doTest();
+        };
+
+        parseEditor();
+
+
+        sys.createUnit({
+            initInput: "global",
+            commands: []
+        });
+
+
+
+        function userPublish() {
+
+            var options = JSON.parse(input.value);
+            sys.unit[1].outChannel = options.outChannel;
+            sys.unit[1].signature = options.signature;
+            sys.unit[1].publish(options.message);
+            sys.output("publish", "@ " + options.outChannel.join(' ') + " > " + options.message.join(' '));
+        }
+
+
+
+        function doTest() {
+
+            /*
+            console.log(sys.match(
+                ["hey", '(', "man", "cat", "bar", ')', "dog", "cat", "meh", "foo"],
+                ["hey", "#p", "cat", "#z", "foo"]
+            ));
+            */
+
+            //sys.unit[1].publish("this is a brand new world".split(' '));
+
+            //console.log(sys.getDeliveryPlan(['a', 'b', 'c']));
+
+            /*
+                sys.unit[3].outChannel = ['a', 'i', 'j', 'b', 'c'];
+                sys.unit[3].publish(['this', 'is', 'it']);
+                console.log(sys.jobQueue);
+            */
+
+            /*
+            console.log(sys.match(
+                ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e'],
+                ['a', '#x', 'd', '#y']
+            ));
+            */
+        }
+
+
+
+    </script>
 </body>
 
 </html>

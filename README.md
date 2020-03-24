@@ -79,7 +79,7 @@ A command starts with a special character (the instruction), followed by a strin
 ```
 + hey @ global > hello world
 ```
-We have 3 commands:
+You have 3 commands:
 
 - `+ hey` -> if the received message matches the pattern "hey"
 

@@ -2,14 +2,7 @@
 
 
 
-const editor = document.getElementById("editor");
-const output = document.getElementById("output");
-
-output.value = '';
-
-
-
-const sys = {
+var sys = {
     unit: {},
     category: {},
     delivery: {
@@ -25,10 +18,17 @@ const sys = {
 
 
 
-function Unit(AST) {
+sys.output = function (topic, message) {
+
+    output.value += '['+topic+']'+' '.repeat(10-topic.length)+message+'\n';
+}
+
+
+
+function Unit(AST, id) {
 
     this.AST = AST;
-    this.id = sys.newId();
+    this.id = id || sys.newId();
     this.inbox = [];
     this.signature = [this.id];
     this.inChannel = this.AST.initInput;
@@ -48,7 +48,7 @@ Unit.prototype.publish = function (msg) {
 
     var deliveryPlan = sys.getDeliveryPlan(this.outChannel);
 
-    console.log("[deliveryPlan]", deliveryPlan);
+    //console.log("[deliveryPlan]", deliveryPlan);
 
     for (let receiver in deliveryPlan) {
 
@@ -167,30 +167,9 @@ sys.populate = function (source) {
 
 
 
-sys.parseEditor = function () {
+sys.createUnit = function (AST, id) {
 
-    sys.populate(editor.value);
-
-    output.value = "parsed\n";
-    if (0) for (let u in sys.unit) {
-        output.value += "\n[ID]→ " + sys.unit[u].id + " [InChannel]→ " + sys.unit[u].AST.initInput.join(", ") + '\n';
-        sys.unit[u].AST.commands.forEach(command => {
-            output.value += "[Com]→ " + command.com;
-            if (command.id) output.value += " [Var]→ " + command.id;
-            if (Array.isArray(command.arg)) output.value += " [Arg]→ " + command.arg.join(", ");
-            else if (command.arg) output.value += " [Old]→ " + command.arg.old.join(", ") + " [New]→ " + command.arg.new.join(", ");
-            output.value += "\n";
-        });
-    }
-
-    doTest();
-};
-
-
-
-sys.createUnit = function (AST) {
-
-    var unit = new Unit(AST);
+    var unit = new Unit(AST, id);
     sys.unit[unit.id] = unit;
 
     sys.newPath(unit.id, unit.AST.initInput, sys.delivery);
@@ -322,13 +301,20 @@ sys.buildDeliveryPlan = function (channel, node, capture) {
 
 
 
-sys.step = function (keepRunning) {
+sys.step = function (keepRunning, forever) {
+
+    if (forever || (keepRunning && sys.jobQueue.length > 0)) {
+
+        if (!forever) setTimeout(function () { sys.step(true); }, sys.delay);
+        else setTimeout(function () { sys.step(true, true); }, sys.delay);
+    }
 
     var job, unit;
 
     job = sys.jobQueue.shift();
-    unit = sys.unit[job.receiver];
+    if (!job) return;
 
+    unit = sys.unit[job.receiver];
     if (!unit) return;
 
     unit.receivedMessage = job.message;
@@ -356,11 +342,6 @@ sys.step = function (keepRunning) {
                 sys.execute[doing.com[0]](unit, doing);
             }
         }
-    }
-
-    if (keepRunning && sys.jobQueue.length > 0) {
-
-        setTimeout(function () { sys.step(true); }, sys.delay);
     }
 }
 
@@ -391,8 +372,7 @@ sys.execute = {
 
     '^': function (unit, doing) { // output
 
-        console.log("[output]", doing.arg);
-        output.value += doing.arg.join(' ') + '\n';
+        sys.output("stdout", doing.arg.join(' '));
     },
 
 
@@ -441,7 +421,7 @@ sys.execute = {
 
         if (outcome) {
 
-            console.log("[outcome]", outcome);
+            //console.log("[outcome]", outcome);
             unit.setVariables(outcome);
 
         } else {
@@ -458,7 +438,7 @@ sys.execute = {
 
         if (outcome) {
 
-            console.log("[outcome]", outcome);
+            //console.log("[outcome]", outcome);
             unit.setVariables(outcome);
 
             unit.skipCommands = true;
@@ -476,7 +456,7 @@ sys.execute = {
 
         if (outcome) {
 
-            console.log("[outcome]", outcome);
+            //console.log("[outcome]", outcome);
             unit.setVariables(outcome);
 
         } else {
@@ -496,7 +476,7 @@ sys.execute = {
 
         if (outcome) {
 
-            console.log("[outcome]", outcome);
+            //console.log("[outcome]", outcome);
             unit.setVariables(outcome);
 
             unit.skipCommands = true;
@@ -578,9 +558,9 @@ sys.execute = {
 
     '*': function (unit, doing) { // create units
 
-        console.log("[doing.arg.join(' ')]", doing.arg.join(' '));
+        //console.log("[doing.arg.join(' ')]", doing.arg.join(' '));
         sys.populate(doing.arg.join(' '));
-        console.log("[sys.unit]", sys.unit);
+        //console.log("[sys.unit]", sys.unit);
     },
 
 
@@ -710,36 +690,6 @@ sys.match = function (message, pattern) {
     var result = sys.queryLine(message, tmpTree);
 
     return result ? sys.capture : false;
-}
-
-
-
-function doTest() {
-
-
-    console.log(sys.match(
-        ["hey", '(', "man", "cat", "bar", ')', "dog", "cat", "meh", "foo"],
-        ["hey", "#p", "cat", "#z", "foo"]
-    ));
-
-
-    sys.unit[1].publish("this is a brand new world".split(' '));
-
-
-    //console.log(sys.getDeliveryPlan(['a', 'b', 'c']));
-
-    /*
-        sys.unit[3].outChannel = ['a', 'i', 'j', 'b', 'c'];
-        sys.unit[3].publish(['this', 'is', 'it']);
-        console.log(sys.jobQueue);
-    */
-
-    /*
-    console.log(sys.match(
-        ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c', 'd', 'e'],
-        ['a', '#x', 'd', '#y']
-    ));
-    */
 }
 
 

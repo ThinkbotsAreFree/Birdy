@@ -25,7 +25,12 @@ textarea {
 
 
 #output {
-    min-height: 15em;
+    min-height: 12em;
+}
+
+
+#input {
+    min-height: 7em;
 }
 
 
@@ -40,4 +45,12 @@ button {
     border-radius: 4px;
     color: #ccc;
     margin-top: 0.5em;
+}
+
+
+#main {
+    width: 1280px;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }

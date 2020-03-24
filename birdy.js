@@ -301,11 +301,13 @@ sys.buildDeliveryPlan = function (channel, node, capture) {
 
 
 
-sys.step = function (keepRunning, forever) {
+sys.step = function (keepRunning, forever, button) {
+
+    if (button) sys.output('ui', button.innerHTML);
 
     if (forever || (keepRunning && sys.jobQueue.length > 0)) {
 
-        if (!forever) setTimeout(function () { sys.step(true); }, sys.delay);
+        if (!forever) setTimeout(function () { sys.step(true, false); }, sys.delay);
         else setTimeout(function () { sys.step(true, true); }, sys.delay);
     }
 

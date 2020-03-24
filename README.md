@@ -10,6 +10,8 @@ BirdyVM is
 
 A concise language, based on special characters instead of keywords, is used to describe a population of nodes called **units**, which communicate asynchronously through a **publish/subscribe** system.
 
+A working prototype is online here: [ProjectBirdyVM/](http://thinkbots.are.free.fr/ProjectBirdyVM/)
+
 Here is a complete list of the 32 characters with special meaning.
 
 ```
@@ -59,7 +61,7 @@ Here is a complete list of the 32 characters with special meaning.
 
 ### Pub/sub
 
-A BirdyVM program is made of a lot of very small teleo-reactive agents, the "units".
+A BirdyVM program is made of a lot of very small teleo-reactive agents, called "units".
 
 During the execution of the VM, units continuously receive and send messages to one another, asynchronously, and anonymously.
 
@@ -278,6 +280,8 @@ It is possible to configure a unit to listen to every channel that matches a pat
 For example, `{ ch.#A` means "subscribe to every channel that matches `ch.#A`". With this subscription, when a message is received on channel `ch.bar`, the variable `A` will contain `bar`.
 
 To unsubscribe from a channel pattern, the exact same pattern must be given as argument, like this: `} ch.#A`
+
+Actually, when you design your programs, channel patterns should be the preferred method for analysing a situation. Instead of choosing a simple channel and a complex message, always make complex channels and simple messages, because this is how you'll make the *entire* system adapt to a situation. Relevant data should be in the `@` channel, rather than in the `>` message.
 
 ### Units creation
 

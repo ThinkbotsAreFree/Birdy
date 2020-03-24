@@ -12,13 +12,13 @@
 <body>
     <div id="main">
         <img id="banner" src="birdy.png">
-        <h1>BirdyVM</h1>
+        <h2>BirdyVM</h2>
         <div class="right">Editor</div>
         <textarea id="editor"></textarea>
         <button onclick="parseEditor(true)">Parse</button>
-        <button onclick="sys.step()">Step once</button>
-        <button onclick="sys.step(true)">Step while</button>
-        <button onclick="sys.step(true,true)">Run loop</button>
+        <button onclick="sys.step(false, false, this)">Step once</button>
+        <button onclick="sys.step(true, false, this)">Step while</button>
+        <button onclick="sys.step(true, true, this)">Run loop</button>
 
         <br><br>
         <div class="right">Output</div>
@@ -44,9 +44,9 @@
         editor.value = "| hi there ^ hello world";
         output.value = '';
         input.value = `{
-    "outChannel": ["hi", "there"],
-    "signature": ["user"],
-    "message": ["go"]
+    "outChannel": "hi there",
+    "signature": "user",
+    "message": "go"
 }`;
 
 
@@ -94,10 +94,10 @@
         function userPublish() {
 
             var options = JSON.parse(input.value);
-            sys.unit[1].outChannel = options.outChannel;
-            sys.unit[1].signature = options.signature;
-            sys.unit[1].publish(options.message);
-            sys.output("publish", "@ " + options.outChannel.join(' ') + " > " + options.message.join(' '));
+            sys.unit[1].outChannel = options.outChannel.replace(/\s+/g, ' ').split(' ');
+            sys.unit[1].signature = options.signature.replace(/\s+/g, ' ').split(' ');
+            sys.unit[1].publish(options.message.replace(/\s+/g, ' ').split(' '));
+            sys.output("publish", "@ " + sys.unit[1].outChannel.join(' ') + " > " + options.message.replace(/\s+/g, ' '));
         }
 
 

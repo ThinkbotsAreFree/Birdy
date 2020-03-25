@@ -251,9 +251,7 @@ This would send `here is my value`.
 
 A Scheme expression can be evaluated and its return value stored in a variable with the `&1` **eval Scheme** command.
 ```
-=x 2
-&r [+ 1] $x
-^ result $r
+&r [+ 1 2] ^ result $r
 ```
 This would output `result 3`. In the current implementation, the interpreter is [BiwaScheme-0.6.9](https://www.biwascheme.org/index.html).
 

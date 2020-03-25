@@ -29,13 +29,16 @@
         <textarea id="input"></textarea>
         <button onclick="userPublish()">Publish</button>
 
+        <script src="biwascheme-0.6.9.js"></script>
+
         <script src="parser.js"></script>
         <script src="birdy.js"></script>
     </div>
 
     <script>
 
-
+        var onSchemeError = function (e) { console.error("[BiwaScheme]", e); };
+        var biwaScheme = new BiwaScheme.Interpreter(onSchemeError);
 
         const editor = document.getElementById("editor");
         const output = document.getElementById("output");
@@ -81,7 +84,7 @@
             doTest();
         };
 
-        parseEditor();
+        //parseEditor();
 
 
         sys.createUnit({
@@ -105,7 +108,7 @@
         function doTest() {
         }
 
-        
+
 
     </script>
 </body>

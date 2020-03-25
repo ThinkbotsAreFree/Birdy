@@ -509,11 +509,11 @@ sys.execute = {
 
 
 
-    '&': function (unit, doing) { // get usual value
+    '&': function (unit, doing) { // eval scheme
 
-        var value = unit.localVar[unit.getTargetVariable(doing.id)];
+        var expr = '('+doing.arg.join(' ')+')';
 
-        unit.setVariables({ ['#' + doing.id]: sys.getUsual(value) });
+        unit.setVariables({ ['#' + doing.id]: biwaScheme.evaluate(expr) });
     },
 
 
@@ -695,119 +695,5 @@ sys.match = function (message, pattern) {
 
     return result ? sys.capture : false;
 }
-
-
-
-sys.getUsual = (function () {
-
-    var corpus = [];
-
-    var getExtensions = function (base, corpus) {
-        var result = [];
-        for (let c of corpus) {
-            var discard = false;
-            for (let b of base)
-                if (!c.includes(b)) {
-                    discard = true;
-                    break;
-                }
-            if (!discard) result.push(c);
-        }
-        return result;
-    }
-
-    // from https://stackoverflow.com/questions/11919065/sort-an-array-by-the-levenshtein-distance-with-best-performance-in-javascript
-    var distance = function (s, t) {
-
-        var d = [];
-        var n = s.length;
-        var m = t.length;
-        if (n == 0) return m;
-        if (m == 0) return n;
-        for (var i = n; i >= 0; i--) d[i] = [];
-        for (var i = n; i >= 0; i--) d[i][0] = i;
-        for (var j = m; j >= 0; j--) d[0][j] = j;
-        for (var i = 1; i <= n; i++) {
-            var s_i = s[i - 1];
-            for (var j = 1; j <= m; j++) {
-                if (i == j && d[i][j] > 4) return n;
-                var t_j = t[j - 1];
-                var cost = (s_i == t_j) ? 0 : 1;
-                var mi = d[i - 1][j] + 1;
-                var b = d[i][j - 1] + 1;
-                var c = d[i - 1][j - 1] + cost;
-                if (b < mi) mi = b;
-                if (c < mi) mi = c;
-                d[i][j] = mi;
-                if (i > 1 && j > 1 && s_i == t[j - 2] && s[i - 2] == t_j) {
-                    d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + cost);
-                }
-            }
-        }
-        return d[n][m];
-    }
-
-    var getScores = function (base, line) {
-
-        var score = [];
-        for (let l = 0; l < line.length; l++) score[l] = 0;
-        for (let l = 0; l < line.length; l++) {
-            for (let word of line[l]) {
-                for (let l2 = 0; l2 < line.length; l2++) {
-                    if (line[l2].includes(word)) score[l2] += 1;
-                }
-            }
-        }
-        var result = [];
-        for (let r = 0; r < score.length; r++) {
-            var ls = score[r];
-            var ld = distance(base, line[r]);
-            var ll = line[r].length;
-            result.push({
-                line: line[r],
-                score: [
-                    ls / ld / ll,
-                    ls / ld / 1,
-                    ls / 1 / 1,
-                    1 / ld / ll,
-                    1 / ld / 1,
-                    1 / 1 / ll
-                ]
-            });
-        }
-        return result;
-    }
-
-    var getBest = function (base, result) {
-
-        for (let method = 0; method < 6; method++) {
-            var best = [];
-            for (let r of result) {
-                var highest = 0;
-                if (r.score[method] > highest) {
-                    best = [r.line];
-                    highest = r.score[method];
-                }
-                else if (r.score[method] === highest) best.push(r.line);
-            }
-            if (best.length === 1) return best[0];
-        }
-        return base;
-    }
-
-    return function (sequence, maxCorpusLength) {
-
-        var extensions = getExtensions(sequence, corpus);
-        var scores = getScores(sequence, extensions);
-        var best = getBest(sequence, scores);
-
-        while (corpus.length >= maxCorpusLength)
-            corpus.splice(Math.floor(Math.random()*corpus.length), 1);
-
-        corpus.push(sequence);
-
-        return best;
-    }
-})();
 
 

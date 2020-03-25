@@ -247,6 +247,16 @@ This would assign the value `my value` to the variable named `my variable`. To r
 ```
 This would send `here is my value`.
 
+#### Scheme interpretation
+
+A Scheme expression can be evaluated and its return value stored in a variable with the `&1` **eval Scheme** command.
+```
+=x 2
+&r [+ 1] $x
+^ result $r
+```
+This would output `result 3`. In the current implementation, the interpreter is [BiwaScheme-0.6.9](https://www.biwascheme.org/index.html).
+
 ### State persistence
 
 The whole state of a unit remains unchanged between the receptions of 2 messages. The emission channel and variables' content won't be deleted after a message has been treated.
@@ -283,7 +293,7 @@ To unsubscribe from a channel pattern, the exact same pattern must be given as a
 
 Actually, when you design your programs, channel patterns should be the preferred method for analysing a situation. Instead of choosing a simple channel and a complex message, always make complex channels and simple messages, because this is how you'll make the *entire* system adapt to a situation. Relevant data should be in the `@` channel, rather than in the `>` message.
 
-### Units creation
+### Units and rules generation
 
 The *create unit* command `*` takes its argument and makes a new unit out of it.
 ```
@@ -357,9 +367,9 @@ The *set value* command assigns a value to a variable.
 
 The *call SRS* command executes a matching rule, and assigns to a variable the return value of the responding rule.
 
-### &1 get usual value
+### &1 eval Scheme
 
-The *get usual value* command assigns to a variable a plausibly more "complete version" of the value given as argument, based on previous values given to *get usual value*.
+The *eval Scheme* command assigns to a variable the result of evaluating a Scheme expression given as argument. In the current implementation, the interpreter is [BiwaScheme-0.6.9](https://www.biwascheme.org/index.html).
 
 ### %1 / replace in value
 

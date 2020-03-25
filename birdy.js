@@ -13,6 +13,7 @@ var sys = {
     jobQueue: [],
     capture: {},
     delay: 500,
+    maxCorpus: 1000,
     todo: []
 };
 
@@ -508,7 +509,7 @@ sys.execute = {
 
 
 
-    '&': function (unit, doing) { // append to variable
+    '&': function (unit, doing) { // get usual value
 
         var value = unit.localVar[unit.getTargetVariable(doing.id)];
 
@@ -794,12 +795,17 @@ sys.getUsual = (function () {
         return base;
     }
 
-    return function (sequence, inhibitLearning) {
+    return function (sequence, maxCorpusLength) {
 
         var extensions = getExtensions(sequence, corpus);
         var scores = getScores(sequence, extensions);
         var best = getBest(sequence, scores);
-        if (!inhibitLearning) corpus.push(sequence);
+
+        while (corpus.length >= maxCorpusLength)
+            corpus.splice(Math.floor(Math.random()*corpus.length), 1);
+
+        corpus.push(sequence);
+
         return best;
     }
 })();

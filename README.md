@@ -24,7 +24,7 @@ Here is a complete list of the 32 characters with special meaning.
     $1      insert value
     =1      set value
     :1      call SRS
-    &1      append to value
+    &1      get usual value
     %1 /    replace in value
     €1      execute value
 
@@ -205,7 +205,7 @@ This would assign the string `my new value` to the variable `x`.
 
 You can append (concatenate) a new value to a variable.
 ```
-&x is the longest value
+=x $x is the longest value
 ```
 Now `x` contains the value `my new value is the longest value`.
 
@@ -357,9 +357,9 @@ The *set value* command assigns a value to a variable.
 
 The *call SRS* command executes a matching rule, and assigns to a variable the return value of the responding rule.
 
-### &1 append to value
+### &1 get usual value
 
-The *append to value* command concatenates a string to the value in a variable.
+The *get usual value* command assigns to a variable a plausibly more "complete version" of the value given as argument, based on previous values given to *get usual value*.
 
 ### %1 / replace in value
 

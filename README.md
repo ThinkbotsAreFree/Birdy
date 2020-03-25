@@ -24,7 +24,7 @@ Here is a complete list of the 32 characters with special meaning.
     $1      insert value
     =1      set value
     :1      call SRS
-    &1      get usual value
+    &1      eval Scheme
     %1 /    replace in value
     €1      execute value
 

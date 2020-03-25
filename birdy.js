@@ -159,7 +159,7 @@ sys.newId = (function () {
 
 sys.populate = function (source) {
 
-    var parsed = parser.parse(source);
+    var parsed = parser.parse(commentParser.parse(source));
 
     parsed.units.forEach(unitAST => sys.createUnit(unitAST));
     parsed.categories.forEach(cat => sys.createCategory(cat));
@@ -553,7 +553,7 @@ sys.execute = {
     '€': function (unit, doing) { // execute variable
 
         var program = unit.localVar[unit.getTargetVariable(doing.id)].concat(doing.arg);
-        var parsed = parser.parse("| dummy " + program.join(' '));
+        var parsed = parser.parse(commentParser.parse("| dummy " + program.join(' ')));
 
         sys.todo = parsed[0].commands.concat(sys.todo);
     },

@@ -1,0 +1,42 @@
+#bigpicture-container {
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  min-height: 100%;
+  min-width: 100%;
+  background: hsl(51, 10%, 74%);
+  background: radial-gradient(hsl(51, 10%, 94%) 0%, hsl(52, 10%, 88%) 40%, hsl(54, 5%, 73%) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d5cea6', endColorstr='#b7ad70', GradientType=0);
+  -webkit-font-smoothing: antialiased;
+  color: #333;
+}
+
+#bigpicture {
+  position: absolute;
+  z-index: -1;
+}
+
+.text {
+  font-family: Roboto;
+  line-height: 1.1;
+  outline: 0;
+  position: absolute;
+  min-width: 2px;
+  cursor: text;
+  word-wrap: break-word;
+  white-space: pre;
+  transition-duration: inherit;
+}
+
+.notransition {
+  transition-duration: 0s;
+}
+
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

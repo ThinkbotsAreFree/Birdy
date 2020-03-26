@@ -12,16 +12,28 @@ var sys = {
     },
     jobQueue: [],
     capture: {},
-    delay: 500,
-    maxCorpus: 1000,
-    todo: []
+    delay: 50,
+    todo: [],
+    newBorn: [],
+    status: "Paused"
 };
 
 
 
 sys.output = function (topic, message) {
 
-    output.value += '['+topic+']'+' '.repeat(10-topic.length)+message+'\n';
+    Toastify({
+        text: `<span class="output-topic">${topic}</span> `+message,
+        duration: 3000, 
+        destination: "https://github.com/ThinkbotsAreFree/Birdy",
+        newWindow: true,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: 'right', // `left`, `center` or `right`
+        backgroundColor: "linear-gradient(to bottom, #666, #444)",
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        onClick: function(){} // Callback after click
+    }).showToast();    
 }
 
 
@@ -109,6 +121,13 @@ Unit.prototype.suicide = function () {
 
 
 
+sys.kill = function(id) {
+
+    sys.unit[id].suicide();
+}
+
+
+
 Unit.prototype.performSubstitution = function (line) {
 
     if (!Array.isArray(line)) return line;
@@ -157,21 +176,32 @@ sys.newId = (function () {
 
 
 
-sys.populate = function (source) {
+sys.populate = function (source, uiElement) {
 
-    var parsed = parser.parse(commentParser.parse(source));
+    var parsed;
+    sys.newBorn = [];
 
-    parsed.units.forEach(unitAST => sys.createUnit(unitAST));
-    parsed.categories.forEach(cat => sys.createCategory(cat));
+    try {
+        parsed = parser.parse(commentParser.parse(source));
+    } catch(e) {
+        console.log("Parser failed");
+    }
 
+    if (parsed) {
+        //sys.output("parser", "Parser success")
+        parsed.units.forEach(unitAST => sys.createUnit(unitAST, false, uiElement));
+        parsed.categories.forEach(cat => sys.createCategory(cat));
+    }
 };
 
 
 
-sys.createUnit = function (AST, id) {
+sys.createUnit = function (AST, id, uiElement) {
 
-    var unit = new Unit(AST, id);
+    var unit = new Unit(AST, id, uiElement);
     sys.unit[unit.id] = unit;
+
+    sys.newBorn.push(unit.id);
 
     sys.newPath(unit.id, unit.AST.initInput, sys.delivery);
 };
@@ -302,9 +332,23 @@ sys.buildDeliveryPlan = function (channel, node, capture) {
 
 
 
-sys.step = function (keepRunning, forever, button) {
+sys.stop = function () {
+    $("#status").html("Paused");
+    sys.status = "Paused";
+    sys.output('ui', "Stop Loop");
+};
 
-    if (button) sys.output('ui', button.innerHTML);
+
+
+sys.step = function (keepRunning, forever, ui) {
+
+    if (sys.stopLoop) { forever = false; keepRunning = false; sys.stopLoop = false; }
+
+    if (ui) {
+        $("#status").html("Running");
+        sys.status = "Running";
+        if (ui.innerHTML) sys.output('ui', ui.innerHTML);
+    }
 
     if (forever || (keepRunning && sys.jobQueue.length > 0)) {
 
@@ -345,6 +389,11 @@ sys.step = function (keepRunning, forever, button) {
                 sys.execute[doing.com[0]](unit, doing);
             }
         }
+    }
+
+    if (!forever && (sys.jobQueue.length === 0 || !keepRunning)) {
+        $("#status").html("Paused");
+        sys.status = "Paused";
     }
 }
 

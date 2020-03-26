@@ -1,114 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta charset="utf-8">
     <title>BirdyVM</title>
-    <link rel="stylesheet" href="normalize.css" type="text/css">
-    <link rel="stylesheet" href="main.css" type="text/css">
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <link href="normalize.css" rel="stylesheet">
+    <link href="bigpicture.css" rel="stylesheet">
+    <link href="toastify.min.css" rel="stylesheet">
+    <link href="main.css" rel="stylesheet">
 </head>
 
 <body>
-    <div id="main">
-        <img id="banner" src="birdy.png">
-        <h2>BirdyVM</h2>
-        <div class="right">Editor</div>
-        <textarea id="editor"></textarea>
-        <button onclick="parseEditor(true)">Parse</button>
-        <button onclick="sys.step(false, false, this)">Step once</button>
-        <button onclick="sys.step(true, false, this)">Step while</button>
-        <button onclick="sys.step(true, true, this)">Run loop</button>
 
-        <br><br>
-        <div class="right">Output</div>
-        <textarea id="output"></textarea>
-
-        <br><br>
-        <div class="right">Input</div>
-        <textarea id="input"></textarea>
-        <button onclick="userPublish()">Publish</button>
-
-        <script src="biwascheme-0.6.9.js"></script>
-
-        <script src="comment-parser.js"></script>
-        <script src="parser.js"></script>
-        <script src="birdy.js"></script>
+    <div id="toolbar">
+        <button onclick="sys.step(false, false, this)">Step Once</button>
+        <button onclick="sys.step(true, false, this)">Step While</button>
+        <button onclick="sys.step(true, true, this)">Run Loop</button>
+        <button onclick="sys.stop()">Stop Loop</button>
+        <button onclick="window.open('https://github.com/ThinkbotsAreFree/Birdy', '_blank')">Help Docs</button>
+        <input id="user-input" type="text" placeholder="command">
+        <img src="birdy-transparent.png">
     </div>
+
+    <span id="info">
+        <span id="version">BirdyVM - Version 0.1.0. - </span>
+        <span id="status">Paused</span>
+    </span>
+
+    <div id="bigpicture-container">
+        <div id="bigpicture" data-zoom="1" data-x="721" data-y="480">
+            <div class="text" data-size="20" data-x="1000" data-y="1000">[BirdyVM]</div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="birdy.js"></script>
+    <script type="text/javascript" src="comment-parser.js"></script>
+    <script type="text/javascript" src="parser.js"></script>
+    <script type="text/javascript" src="bigpicture.js"></script>
+    <script type="text/javascript" src="toastify-js.js"></script>
 
     <script>
 
-        var onSchemeError = function (e) { console.error("[BiwaScheme]", e); };
-        var biwaScheme = new BiwaScheme.Interpreter(onSchemeError);
+        sys.populate(`
+            | user
+        `);
 
-        const editor = document.getElementById("editor");
-        const output = document.getElementById("output");
-        const input = document.getElementById("input");
+        $("#user-input").keypress(function (e) {
 
-        editor.value = "| hi there ^ hello world";
-        output.value = '';
-        input.value = `{
-    "outChannel": "hi there",
-    "signature": "user",
-    "message": "go"
-}`;
+            if (e.which === 13) {
 
+                var parsed;
+                try {
+                    var com = $(this).val();
+                    sys.output("ui", com);
+                    com = "| user " + com;
+                    parsed = parser.parse(commentParser.parse(com));
+                } catch (e) {
+                    sys.output("system", "Parser failed: " + com);
+                }
+                if (parsed) {
 
-        function parseEditor() {
+                    sys.unit['1'].AST.commands = parsed.units[0].commands;
 
-            sys.deliver = {};
-            sys.unit = {};
-            sys.createUnit({
-                initInput: "global",
-                commands: []
-            }, 1);
+                    sys.jobQueue.push({
+                        receiver: '1',
+                        message: "user",
+                        signature: "user",
+                        capture: {},
+                        senderId: '1'
+                    });
 
-
-            try {
-                sys.populate(editor.value);
-                sys.output("parser", "parsed");
-            } catch (e) {
-                sys.output("parser", e.message);
+                    if (sys.status === "Paused") sys.step(true, false, true);
+                }
             }
-
-            if (0) for (let u in sys.unit) {
-                output.value += "\n[ID]→ " + sys.unit[u].id + " [InChannel]→ " + sys.unit[u].AST.initInput.join(", ") + '\n';
-                sys.unit[u].AST.commands.forEach(command => {
-                    output.value += "[Com]→ " + command.com;
-                    if (command.id) output.value += " [Var]→ " + command.id;
-                    if (Array.isArray(command.arg)) output.value += " [Arg]→ " + command.arg.join(", ");
-                    else if (command.arg) output.value += " [Old]→ " + command.arg.old.join(", ") + " [New]→ " + command.arg.new.join(", ");
-                    output.value += "\n";
-                });
-            }
-
-            doTest();
-        };
-
-        //parseEditor();
-
-
-        sys.createUnit({
-            initInput: "global",
-            commands: []
         });
-
-
-
-        function userPublish() {
-
-            var options = JSON.parse(input.value);
-            sys.unit[1].outChannel = options.outChannel.replace(/\s+/g, ' ').split(' ');
-            sys.unit[1].signature = options.signature.replace(/\s+/g, ' ').split(' ');
-            sys.unit[1].publish(options.message.replace(/\s+/g, ' ').split(' '));
-            sys.output("publish", "@ " + sys.unit[1].outChannel.join(' ') + " > " + options.message.replace(/\s+/g, ' '));
-        }
-
-
-
-        function doTest() {
-        }
-
 
 
     </script>

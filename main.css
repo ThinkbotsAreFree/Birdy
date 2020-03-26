@@ -1,56 +1,67 @@
-
-
-body {
-    background: #222;
-    color: #ccc;
+@font-face {
+    font-family: Roboto;
+    src: url("Roboto-Regular.ttf");
 }
 
 
-#banner {
-    max-width: 100%;
+body * {
+    font-family: Roboto;
 }
 
-
-textarea {
+#toolbar {
+    background: linear-gradient(hsl(356, 47%, 47%), hsl(356, 42%, 37%));
+    height: 64px;
+    user-select: none;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    z-index: 2;
     width: 100%;
-    box-sizing: border-box;
-    min-height: 10em;
-    resize: vertical;
-    background: #333;
-    color: #ccc;
+}
+
+#toolbar img {
+    float: right;
+    max-height: 100%;
+}
+
+#toolbar button {
     border: none;
-    outline: none;
-    font-family: Consolas, monospace;
+    background: none;
+    height: 64px;
+    width: 64px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
 }
 
-
-#output {
-    min-height: 12em;
+#toolbar button:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
-
-#input {
-    min-height: 7em;
+#info {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+    font-size: 12px;
 }
 
-
-.right {
-    text-align: right;
+#user-input::placeholder {
+    font-style: italic;
 }
 
-
-button {
-    background: #333;
-    border: 2px solid #777;
-    border-radius: 4px;
-    color: #ccc;
-    margin-top: 0.5em;
+#user-input {
+    background: hsl(356, 47%, 77%);
+    border: none;
+    border-bottom: 1px solid hsl(356, 47%, 87%);
+    line-height: 32px;
+    position: relative;
+    top: -8px;
+    left: 16px;
+    width: calc(100% - 2em - 512px);
+    padding: 0 1em 0 1em;
 }
 
-
-#main {
-    width: 1280px;
-    max-width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+.output-topic {
+    color: #999;
 }

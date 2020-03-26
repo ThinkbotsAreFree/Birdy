@@ -63,11 +63,13 @@ var bigpicture = (function () {
             var jqtb = $(ev.target);
             var units = jqtb.data("units");
             if (units) {
-                //sys.output("system", "Deleting "+units);
                 units.split(',').forEach(sys.kill);
             }
-            sys.populate(jqtb.html());
+            sys.populate(jqtb.text());
             jqtb.data("units", sys.newBorn.join(','));
+            for (let u of sys.newBorn) {
+                sys.unit[u].ui = jqtb;
+            }
         });
 
         return tb;
@@ -260,7 +262,9 @@ var bigpicture = (function () {
     }
 
     if ("onmousewheel" in document) { bpContainer.onmousewheel = mousewheel; }
-    else { bpContainer.addEventListener('DOMMouseScroll', mousewheel, false); }
+    else {
+        bpContainer.addEventListener('DOMMouseScroll', mousewheel, false);
+    }
 
     /*
      * KEYBOARD SHORTCUTS
@@ -297,6 +301,17 @@ var bigpicture = (function () {
         }
     };
 
+
+    function toolbarZoomIn() {
+        onZoom(current.zoom / 1.7);
+    }
+
+
+    function toolbarZoomOut() {
+        onZoom(current.zoom * 1.7);
+    }
+
+
     /*
      * USEFUL FUNCTIONS
      */
@@ -312,7 +327,9 @@ var bigpicture = (function () {
     return {
         newText: newText,
         current: current,
-        updateTextPosition: updateTextPosition
+        updateTextPosition: updateTextPosition,
+        zoomIn: toolbarZoomIn,
+        zoomOut: toolbarZoomOut
     };
 
 })();

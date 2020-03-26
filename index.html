@@ -1,14 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
     <title>BirdyVM</title>
-    <script type="text/javascript" src="jquery.min.js"></script>
-    <link href="normalize.css" rel="stylesheet">
-    <link href="bigpicture.css" rel="stylesheet">
-    <link href="toastify.min.css" rel="stylesheet">
-    <link href="main.css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <link href="css/normalize.css" rel="stylesheet">
+    <link href="css/bigpicture.css" rel="stylesheet">
+    <link href="css/toastify.min.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
 </head>
 
 <body>
@@ -19,8 +19,10 @@
         <button onclick="sys.step(true, true, this)">Run Loop</button>
         <button onclick="sys.stop()">Stop Loop</button>
         <button onclick="window.open('https://github.com/ThinkbotsAreFree/Birdy', '_blank')">Help Docs</button>
+        <button onclick="bigpicture.zoomIn()">Zoom<br>In</button>
+        <button onclick="bigpicture.zoomOut()">Zoom<br>Out</button>
         <input id="user-input" type="text" placeholder="command">
-        <img src="birdy-transparent.png">
+        <img src="images/birdy-transparent.png">
     </div>
 
     <span id="info">
@@ -34,11 +36,11 @@
         </div>
     </div>
 
-    <script type="text/javascript" src="birdy.js"></script>
-    <script type="text/javascript" src="comment-parser.js"></script>
-    <script type="text/javascript" src="parser.js"></script>
-    <script type="text/javascript" src="bigpicture.js"></script>
-    <script type="text/javascript" src="toastify-js.js"></script>
+    <script type="text/javascript" src="js/birdy.js"></script>
+    <script type="text/javascript" src="js/comment-parser.js"></script>
+    <script type="text/javascript" src="js/parser.js"></script>
+    <script type="text/javascript" src="js/bigpicture.js"></script>
+    <script type="text/javascript" src="js/toastify-js.js"></script>
 
     <script>
 
@@ -53,7 +55,6 @@
                 var parsed;
                 try {
                     var com = $(this).val();
-                    sys.output("ui", com);
                     com = "| user " + com;
                     parsed = parser.parse(commentParser.parse(com));
                 } catch (e) {
@@ -72,6 +73,7 @@
                     });
 
                     if (sys.status === "Paused") sys.step(true, false, true);
+                    $(this).val('');
                 }
             }
         });

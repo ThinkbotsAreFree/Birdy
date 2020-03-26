@@ -23,7 +23,7 @@ var sys = {
 sys.output = function (topic, message) {
 
     Toastify({
-        text: `<span class="output-topic">${topic}</span> `+message,
+        text: `<span class="output-topic">${topic} &nbsp </span> `+message,
         duration: 3000, 
         destination: "https://github.com/ThinkbotsAreFree/Birdy",
         newWindow: true,
@@ -61,7 +61,6 @@ Unit.prototype.publish = function (msg) {
 
     var deliveryPlan = sys.getDeliveryPlan(this.outChannel);
 
-    //console.log("[deliveryPlan]", deliveryPlan);
 
     for (let receiver in deliveryPlan) {
 
@@ -140,7 +139,6 @@ Unit.prototype.performSubstitution = function (line) {
         else if (item[0] !== '$') result.push(item);
         else result = result.concat(this.getTargetVariable(item))
     }
-
     return result;
 }
 
@@ -184,7 +182,6 @@ sys.populate = function (source, uiElement) {
     try {
         parsed = parser.parse(commentParser.parse(source));
     } catch(e) {
-        console.log("Parser failed");
     }
 
     if (parsed) {
@@ -332,6 +329,21 @@ sys.buildDeliveryPlan = function (channel, node, capture) {
 
 
 
+sys.showMessage = function(unit) {
+
+    var msgId = sys.newId();
+
+    unit.ui.html(
+        unit.ui.html().replace(/<br>/g, '').trim() + `<span id="${msgId}" class="message">\n➜ &nbsp; ${unit.receivedMessage.join(' ')}</span>`
+    );
+
+    setTimeout(new Function(`
+        document.getElementById("${msgId}").outerHTML = '';
+    `), 1000);
+}
+
+
+
 sys.stop = function () {
     $("#status").html("Paused");
     sys.status = "Paused";
@@ -368,9 +380,11 @@ sys.step = function (keepRunning, forever, ui) {
     unit.senderSignature = job.signature;
     unit.senderId = job.senderId;
 
+    if (unit.ui) sys.showMessage(unit);
+
     unit.setVariables(job.capture);
 
-    sys.todo = unit.AST.commands.slice();
+    sys.todo = JSON.parse(JSON.stringify(unit.AST.commands));
 
     while (sys.todo.length > 0) {
 
@@ -473,7 +487,6 @@ sys.execute = {
 
         if (outcome) {
 
-            //console.log("[outcome]", outcome);
             unit.setVariables(outcome);
 
         } else {
@@ -490,7 +503,6 @@ sys.execute = {
 
         if (outcome) {
 
-            //console.log("[outcome]", outcome);
             unit.setVariables(outcome);
 
             unit.skipCommands = true;
@@ -508,7 +520,6 @@ sys.execute = {
 
         if (outcome) {
 
-            //console.log("[outcome]", outcome);
             unit.setVariables(outcome);
 
         } else {
@@ -528,7 +539,6 @@ sys.execute = {
 
         if (outcome) {
 
-            //console.log("[outcome]", outcome);
             unit.setVariables(outcome);
 
             unit.skipCommands = true;
@@ -611,9 +621,7 @@ sys.execute = {
 
     '*': function (unit, doing) { // create units
 
-        //console.log("[doing.arg.join(' ')]", doing.arg.join(' '));
         sys.populate(doing.arg.join(' '));
-        //console.log("[sys.unit]", sys.unit);
     },
 
 

@@ -15,7 +15,8 @@ var sys = {
     delay: 50,
     todo: [],
     newBorn: [],
-    status: "Paused"
+    status: "Paused",
+    screen: {}
 };
 
 
@@ -333,8 +334,10 @@ sys.showMessage = function(unit) {
 
     var msgId = sys.newId();
 
-    unit.ui.html(
-        unit.ui.html().replace(/<br>/g, '').trim() + `<span id="${msgId}" class="message">\n➜ &nbsp; ${unit.receivedMessage.join(' ')}</span>`
+    var unitUI = $('#'+unit.ui);
+
+    unitUI.html(
+        unitUI.html().replace(/<br>/g, '').trim() + `<span id="${msgId}" class="message">\n➜ &nbsp; ${unit.receivedMessage.join(' ')}</span>`
     );
 
     setTimeout(new Function(`

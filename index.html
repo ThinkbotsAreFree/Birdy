@@ -26,7 +26,7 @@
     </div>
 
     <span id="info">
-        <span id="version">BirdyVM - Version 0.1.0. - </span>
+        <span id="version">BirdyVM - Version 0.1.1 - </span>
         <span id="status">Paused</span>
     </span>
 
@@ -36,6 +36,7 @@
         </div>
     </div>
 
+    <script type="text/javascript" src="js/localforage.min.js"></script>
     <script type="text/javascript" src="js/birdy.js"></script>
     <script type="text/javascript" src="js/comment-parser.js"></script>
     <script type="text/javascript" src="js/parser.js"></script>
@@ -47,6 +48,10 @@
         sys.populate(`
             | user
         `);
+
+        /*localforage.getItem("screen", function (err, scr) {
+
+        });*/
 
         $("#user-input").keypress(function (e) {
 

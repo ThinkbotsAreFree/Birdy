@@ -50,8 +50,11 @@ var bigpicture = (function () {
         e.style.top = ($(e).data("y") - current.y) / current.zoom - bp.y + 'px';
     }
 
-    function newText(x, y, size, text) {
+    function newText(x, y, size, text, inhib) {
+
         var tb = document.createElement('div');
+        tb.id = sys.newId("tb");
+
         tb.className = "text";
         tb.contentEditable = true;
         tb.innerHTML = text;
@@ -66,9 +69,10 @@ var bigpicture = (function () {
                 units.split(',').forEach(sys.kill);
             }
             sys.populate(jqtb.text());
+
             jqtb.data("units", sys.newBorn.join(','));
             for (let u of sys.newBorn) {
-                sys.unit[u].ui = jqtb;
+                sys.unit[u].ui = ev.target.id;
             }
         });
 

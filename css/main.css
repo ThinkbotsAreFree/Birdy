@@ -33,7 +33,7 @@ body * {
     width: 64px;
     color: white;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 #toolbar button:hover {
@@ -42,8 +42,8 @@ body * {
 
 #info {
     position: fixed;
-    bottom: 0;
-    left: 0;
+    bottom: 8px;
+    left: 8px;
     z-index: 3;
     font-size: 12px;
 }

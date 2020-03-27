@@ -141,7 +141,7 @@ screenParser = /*
         peg$startRuleFunctions = { Source: peg$parseSource },
         peg$startRuleFunction  = peg$parseSource,
 
-        peg$c0 = function(def) { return def; },
+        peg$c0 = function(def) { return def.filter(d => !d.discard); },
         peg$c1 = /^[ \t\r\n]/,
         peg$c2 = peg$classExpectation([" ", "\t", "\r", "\n"], false, false),
         peg$c3 = /^[^|\xA4\\]/,
@@ -154,7 +154,7 @@ screenParser = /*
         },
         peg$c6 = function(c) {
         	return {
-            type: "just",
+            	discard: true,
             	text: '',
                 coordinates: c
             };

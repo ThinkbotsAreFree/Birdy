@@ -67,7 +67,9 @@
 
         localforage.getItem("layout", function (err, layout) {
 
+            layout = layout.replace(/\[BirdyVM\][^\n]*\n/g, '');
             console.log(layout);
+
             if (!err && layout) importLayout(layout);
 
             if (err) sys.inhibAutoSave = true;
@@ -127,7 +129,6 @@
             }
             if (parsed) {
                 parsed.forEach(def => {
-                    console.log("creating "+def.text);
                     bigpicture.newText(
                         def.coordinates.x,
                         def.coordinates.y,
@@ -136,7 +137,6 @@
                     );
                 });
             }
-            console.log("successful");
         }
 
 

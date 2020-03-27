@@ -41,6 +41,8 @@
         </div>
     </div>
 
+    <div id="cycle"><img src="images/cycle.svg"></div>
+
     <script type="text/javascript" src="js/localforage.min.js"></script>
     <script type="text/javascript" src="js/biwascheme-0.6.9.js"></script>
     <script type="text/javascript" src="js/birdy.js"></script>
@@ -70,7 +72,10 @@
             layout = layout.replace(/\[BirdyVM\][^\n]*\n/g, '');
             console.log(layout);
 
-            if (!err && layout) importLayout(layout);
+            if (!err && layout)
+                importLayout(layout);
+            else
+                importLayout(`Search: F3 or CTRL+F<br><br>Pan: click and drag<br><br>Move text: CTRL+click and drag<br><br>Zoom In:  PageDown or CTRL+ or<br>          mousewheel or double-click<br><br>Zoom Out: PageUp or CTRL- or<br>          mousewheel or CTRL+double-click<br><br>Biggest picture: F2 (try it twice)<br> \\1200\\950\\10`);
 
             if (err) sys.inhibAutoSave = true;
         });
@@ -160,7 +165,7 @@
 
             sel.each(ect => {
                 var t = $(sel[ect]);
-                result.push(t.text() + ' \\' + t.data('x') + '\\' + t.data('y') + '\\' + t.data('size'));
+                result.push(t.html() + ' \\' + t.data('x') + '\\' + t.data('y') + '\\' + t.data('size'));
             });
 
             return result.join('\n');

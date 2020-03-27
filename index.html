@@ -26,12 +26,13 @@
     </div>
 
     <span id="info">
-        <span id="version">BirdyVM - Version 0.2.0 - </span>
+        <span id="version">BirdyVM - Version 0.2.1 - </span>
         <span id="status">Paused</span>
     </span>
 
     <span id="zoom">
-        <span id="zoom-in" onclick="bigpicture.zoomIn()">Zoom In</span> | <span id="zoom-out" onclick="bigpicture.zoomOut()">Zoom Out</span>
+        <span id="zoom-in" onclick="bigpicture.zoomIn()">Zoom In</span> | <span id="zoom-out"
+            onclick="bigpicture.zoomOut()">Zoom Out</span>
     </span>
 
     <div id="bigpicture-container">
@@ -41,6 +42,7 @@
     </div>
 
     <script type="text/javascript" src="js/localforage.min.js"></script>
+    <script type="text/javascript" src="js/biwascheme-0.6.9.js"></script>
     <script type="text/javascript" src="js/birdy.js"></script>
     <script type="text/javascript" src="js/comment-parser.js"></script>
     <script type="text/javascript" src="js/total-parser.js"></script>
@@ -49,6 +51,13 @@
     <script type="text/javascript" src="js/toastify-js.js"></script>
 
     <script>
+
+
+
+        var onSchemeError = function (e) { console.error("[BiwaScheme]", e); };
+        var biwaScheme = new BiwaScheme.Interpreter(onSchemeError);
+
+
 
         sys.populate(`
             | user
@@ -64,8 +73,8 @@
 
 
 
-        setInterval(function() {
-            localforage.setItem("layout", getLayout(), function (err) {});
+        setInterval(function () {
+            localforage.setItem("layout", getLayout(), function (err) { });
         }, 4000);
 
 
@@ -109,7 +118,7 @@
             var parsed;
             try {
                 parsed = screenParser.parse(commentParser.parse(source));
-            } catch(e) {
+            } catch (e) {
                 alert(e);
                 console.log(source);
             }
@@ -142,10 +151,10 @@
 
             result = [];
             var sel = $("#bigpicture div.text")
-            
+
             sel.each(ect => {
                 var t = $(sel[ect]);
-                result.push(t.text()+' \\'+t.data('x')+'\\'+t.data('y')+'\\'+t.data('size'));
+                result.push(t.text() + ' \\' + t.data('x') + '\\' + t.data('y') + '\\' + t.data('size'));
             });
 
             return result.join('\n');

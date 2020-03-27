@@ -156,7 +156,7 @@ var bigpicture = (function () {
         sx = (typeof sx === "undefined") ? window.innerWidth / 2 : sx;
         sy = (typeof sy === "undefined") ? window.innerHeight / 2 : sy;
 
-        bp.style.transitionDuration = "0.5s";
+        bp.style.transitionDuration = "0.25s";
 
         bp.x = 0; bp.y = 0;
         bp.updateContainerPosition();

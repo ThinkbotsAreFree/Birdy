@@ -26,7 +26,7 @@
     </div>
 
     <span id="info">
-        <span id="version">BirdyVM - Version 0.2.3 - </span>
+        <span id="version">BirdyVM - Version 0.3.1 - </span>
         <span id="status">Paused</span>
     </span>
 
@@ -191,25 +191,40 @@
 
         var shouldCleanEditor = true;
 
+        var modalIsVisible = false;
 
 
         function alertModal(txt) {
 
-            $("#modal-title").html("Export<br>Please copy the code below.");
-            $("#editor").val(getLayout());
-            $("#import-export-save")[0].style.display = "none";
-            $("#import-export").removeClass("hidden");
-            shouldCleanEditor = true;
+            if (modalIsVisible) closeModal(); else {
+
+                //$("#import-export")[0].style.display = "block";
+
+                $("#modal-title").html("Export<br>Please copy the code below.");
+                $("#editor").val(getLayout());
+                $("#import-export-save")[0].style.display = "none";
+                $("#import-export").removeClass("hidden");
+                shouldCleanEditor = true;
+
+                modalIsVisible = true;
+            }
         }
 
 
 
         function promptModal() {
 
-            $("#modal-title").html("Import<br>Please paste your code below.");
-            $("#import-export-save")[0].style.display = "block";
-            $("#import-export").removeClass("hidden");
-            shouldCleanEditor = false;
+            if (modalIsVisible) closeModal(); else {
+
+                //$("#import-export")[0].style.display = "block";
+
+                $("#modal-title").html("Import<br>Please paste your code below.");
+                $("#import-export-save")[0].style.display = "block";
+                $("#import-export").removeClass("hidden");
+                shouldCleanEditor = false;
+
+                modalIsVisible = true;
+            }
         }
 
 
@@ -218,6 +233,12 @@
 
             $("#import-export").addClass("hidden");
             if (shouldCleanEditor) $("#editor").val('');
+
+            modalIsVisible = false;
+
+            /*setTimeout(function() {
+                $("#import-export")[0].style.display = "none";
+            }, 500)*/
         }
 
 
@@ -227,6 +248,10 @@
             $("#import-export").addClass("hidden");
             setLayout($("#editor").val());
             $("#editor").val('');
+            
+            /*setTimeout(function() {
+                $("#import-export")[0].style.display = "none";
+            }, 500)*/
         }
 
 

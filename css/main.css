@@ -130,11 +130,12 @@ body * {
 }
 
 #editor {
-    width: calc(100% - 32px);
+    width: calc(100% - 34px);
     height: calc(100% - 128px);
     border: 1px solid #ddd;
     position: absolute;
     top: 64px;
     left: 16px;
     resize: none;
+    font-size: 12px;
 }

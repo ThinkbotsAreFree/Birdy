@@ -26,7 +26,7 @@
     </div>
 
     <span id="info">
-        <span id="version">BirdyVM - Version 0.2.1 - </span>
+        <span id="version">BirdyVM - Version 0.2.3 - </span>
         <span id="status">Paused</span>
     </span>
 
@@ -42,6 +42,16 @@
     </div>
 
     <div id="cycle"><img src="images/cycle.svg" width="100%"></div>
+
+    <div id="import-export" class="hidden">
+        <span id="modal-title">
+            Import<br>
+            Paste your code below.
+        </span>
+        <textarea id="editor" spellcheck="false"></textarea>
+        <span id="import-export-save" onclick="saveModal()">✔️</span>
+        <span id="import-export-cancel" onclick="closeModal()">❌</span>
+    </div>
 
     <script type="text/javascript" src="js/localforage.min.js"></script>
     <script type="text/javascript" src="js/biwascheme-0.6.9.js"></script>
@@ -123,7 +133,13 @@
 
         function importLayout(source) {
 
-            source = source || prompt("Paste source code here");
+            if (source) setLayout(source);
+            else promptModal();
+        }
+
+
+
+        function setLayout(source) {
 
             var parsed;
             try {
@@ -152,7 +168,7 @@
             var layout = getLayout();
             if (!sys.inhibAutoSave)
                 localforage.setItem("layout", layout, function (err) {
-                    if (!err) alert(layout);
+                    if (!err) alertModal(layout);
                 });
         }
 
@@ -169,6 +185,48 @@
             });
 
             return result.join('\n');
+        }
+
+
+
+        var shouldCleanEditor = true;
+
+
+
+        function alertModal(txt) {
+
+            $("#modal-title").html("Export<br>Please copy the code below.");
+            $("#editor").val(getLayout());
+            $("#import-export-save")[0].style.display = "none";
+            $("#import-export").removeClass("hidden");
+            shouldCleanEditor = true;
+        }
+
+
+
+        function promptModal() {
+
+            $("#modal-title").html("Import<br>Please paste your code below.");
+            $("#import-export-save")[0].style.display = "block";
+            $("#import-export").removeClass("hidden");
+            shouldCleanEditor = false;
+        }
+
+
+
+        function closeModal() {
+
+            $("#import-export").addClass("hidden");
+            if (shouldCleanEditor) $("#editor").val('');
+        }
+
+
+
+        function saveModal() {
+
+            $("#import-export").addClass("hidden");
+            setLayout($("#editor").val());
+            $("#editor").val('');
         }
 
 

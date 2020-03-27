@@ -94,3 +94,47 @@ body * {
 #cycle img {
     width: 100%;
 }
+
+#import-export {
+    width: 60vw;
+    height: 60vh;
+    position: fixed;
+    top: 20vh;
+    left: 20vw;
+    z-index: 6;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+    background: #eee;
+    border-radius: 8px;
+    padding: 16px;
+    opacity: 1;
+    transition: ease-in-out 0.5s;
+}
+
+#import-export.hidden {
+    opacity: 0;
+    top: -80vh;
+}
+
+#import-export-cancel {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    cursor: pointer;
+}
+
+#import-export-save {
+    position: absolute;
+    top: 16px;
+    right: calc(16px + 2em);
+    cursor: pointer;
+}
+
+#editor {
+    width: calc(100% - 32px);
+    height: calc(100% - 128px);
+    border: 1px solid #ddd;
+    position: absolute;
+    top: 64px;
+    left: 16px;
+    resize: none;
+}

@@ -181,12 +181,11 @@ sys.populate = function (source, uiElement) {
     sys.newBorn = [];
 
     try {
-        parsed = parser.parse(commentParser.parse(source));
+        parsed = totalParser.parse(commentParser.parse(source));
     } catch(e) {
     }
 
     if (parsed) {
-        //sys.output("parser", "Parser success")
         parsed.units.forEach(unitAST => sys.createUnit(unitAST, false, uiElement));
         parsed.categories.forEach(cat => sys.createCategory(cat));
     }
@@ -615,7 +614,7 @@ sys.execute = {
     '€': function (unit, doing) { // execute variable
 
         var program = unit.localVar[unit.getTargetVariable(doing.id)].concat(doing.arg);
-        var parsed = parser.parse(commentParser.parse("| dummy " + program.join(' ')));
+        var parsed = totalParser.parse(commentParser.parse("| dummy " + program.join(' ')));
 
         sys.todo = parsed[0].commands.concat(sys.todo);
     },

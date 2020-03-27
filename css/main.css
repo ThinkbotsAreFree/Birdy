@@ -3,7 +3,6 @@
     src: url("Roboto-Regular.ttf");
 }
 
-
 body * {
     font-family: Roboto;
 }
@@ -40,12 +39,20 @@ body * {
     background: rgba(255, 255, 255, 0.2);
 }
 
-#info {
+#info, #zoom {
     position: fixed;
     bottom: 8px;
-    left: 8px;
     z-index: 3;
     font-size: 12px;
+}
+
+#info {
+    left: 8px;
+}
+
+#zoom {
+    right: 8px;
+    cursor: pointer;
 }
 
 #user-input::placeholder {

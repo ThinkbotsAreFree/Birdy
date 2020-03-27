@@ -61,6 +61,7 @@ var bigpicture = (function () {
         $(tb).data("x", x).data("y", y).data("size", size);
         updateTextPosition(tb);
         bp.appendChild(tb);
+        sys.populate($(tb).text());
 
         $(tb).on("input", function(ev) {
             var jqtb = $(ev.target);

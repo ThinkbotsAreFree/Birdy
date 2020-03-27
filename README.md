@@ -1,5 +1,5 @@
 
-![BirdyVM](https://raw.githubusercontent.com/ThinkbotsAreFree/Birdy/master/birdy.png)
+![BirdyVM](https://raw.githubusercontent.com/ThinkbotsAreFree/Birdy/master/images/birdy.png)
 
 # BirdyVM
 

@@ -62,6 +62,10 @@ var bigpicture = (function () {
         updateTextPosition(tb);
         bp.appendChild(tb);
         sys.populate($(tb).text());
+        $(tb).data("units", sys.newBorn.join(','));
+        for (let u of sys.newBorn) {
+            sys.unit[u].ui = tb.id;
+        }
 
         $(tb).on("input", function(ev) {
             var jqtb = $(ev.target);

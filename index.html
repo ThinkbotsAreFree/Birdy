@@ -36,7 +36,7 @@
 
     <div id="bigpicture-container">
         <div id="bigpicture" data-zoom="1" data-x="721" data-y="480">
-            <div class="text" data-size="20" data-x="1000" data-y="1000">[BirdyVM]</div>
+            <div id="core" class="text" data-size="20" data-x="1000" data-y="1000">[BirdyVM]</div>
         </div>
     </div>
 
@@ -58,6 +58,7 @@
 
         localforage.getItem("layout", function (err, layout) {
 
+            console.log(layout);
             if (!err && layout) importLayout(layout);
         });
 
@@ -128,7 +129,11 @@
 
         function exportLayout() {
 
-            alert(getLayout());
+
+            var layout = getLayout();
+            localforage.setItem("layout", layout, function (err) {
+                if (!err) alert(layout);
+            });
         }
 
 
@@ -139,11 +144,9 @@
             var sel = $("#bigpicture div.text")
             
             sel.each(ect => {
-                var t = $(sel[ect]); // holy shit
+                var t = $(sel[ect]);
                 result.push(t.text()+' \\'+t.data('x')+'\\'+t.data('y')+'\\'+t.data('size'));
             });
-
-            result.shift();
 
             return result.join('\n');
         }

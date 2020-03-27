@@ -69,13 +69,16 @@
 
             console.log(layout);
             if (!err && layout) importLayout(layout);
+
+            if (err) sys.inhibAutoSave = true;
         });
 
 
 
-        setInterval(function () {
-            localforage.setItem("layout", getLayout(), function (err) { });
-        }, 4000);
+        if (!sys.inhibAutoSave)
+            setInterval(function () {
+                localforage.setItem("layout", getLayout(), function (err) { });
+            }, 4000);
 
 
 
@@ -124,6 +127,7 @@
             }
             if (parsed) {
                 parsed.forEach(def => {
+                    console.log("creating "+def.text);
                     bigpicture.newText(
                         def.coordinates.x,
                         def.coordinates.y,
@@ -132,6 +136,7 @@
                     );
                 });
             }
+            console.log("successful");
         }
 
 
@@ -140,9 +145,10 @@
 
 
             var layout = getLayout();
-            localforage.setItem("layout", layout, function (err) {
-                if (!err) alert(layout);
-            });
+            if (!sys.inhibAutoSave)
+                localforage.setItem("layout", layout, function (err) {
+                    if (!err) alert(layout);
+                });
         }
 
 

@@ -85,11 +85,12 @@ body * {
 #cycle {
     width: 100vw;
     height: 100vh;
-    background-image: url("images/cycle.svg");
-    background-size: contain;
-    background-position: center;
     position: fixed;
     top: calc(50vh - 50vw);
     z-index: 4;
     pointer-events: none;
+}
+
+#cycle img {
+    width: 100%;
 }

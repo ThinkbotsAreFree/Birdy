@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <div id="cycle"><img src="images/cycle.svg"></div>
+    <div id="cycle"><img src="images/cycle.svg" width="100%"></div>
 
     <script type="text/javascript" src="js/localforage.min.js"></script>
     <script type="text/javascript" src="js/biwascheme-0.6.9.js"></script>
@@ -69,12 +69,12 @@
 
         localforage.getItem("layout", function (err, layout) {
 
-            layout = layout.replace(/\[BirdyVM\][^\n]*\n/g, '');
             console.log(layout);
 
-            if (!err && layout)
+            if (!err && layout) {
+                layout = layout.replace(/\[BirdyVM\][^\n]*\n/g, '');
                 importLayout(layout);
-            else
+            } else
                 importLayout(`Search: F3 or CTRL+F<br><br>Pan: click and drag<br><br>Move text: CTRL+click and drag<br><br>Zoom In:  PageDown or CTRL+ or<br>          mousewheel or double-click<br><br>Zoom Out: PageUp or CTRL- or<br>          mousewheel or CTRL+double-click<br><br>Biggest picture: F2 (try it twice)<br> \\1200\\950\\10`);
 
             if (err) sys.inhibAutoSave = true;

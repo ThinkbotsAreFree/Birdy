@@ -407,6 +407,8 @@ sys.step = function (keepRunning, forever, ui) {
         }
     }
 
+    unit.skipCommands = false;
+
     if (!forever && (sys.jobQueue.length === 0 || !keepRunning)) {
         $("#status").html("Paused");
         sys.status = "Paused";

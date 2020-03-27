@@ -65,7 +65,7 @@ body * {
     border-bottom: 1px solid hsl(356, 47%, 87%);
     line-height: 32px;
     position: relative;
-    top: -8px;
+    top: -6px;
     left: 16px;
     width: calc(100% - 2em - 640px);
     padding: 0 1em 0 1em;

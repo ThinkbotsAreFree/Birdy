@@ -7,6 +7,11 @@ body * {
     font-family: Roboto;
 }
 
+body *::selection {
+  background: #ff8080;
+  color: white;
+}
+
 #toolbar {
     background: linear-gradient(hsl(356, 47%, 47%), hsl(356, 42%, 37%));
     height: 64px;
@@ -21,7 +26,7 @@ body * {
 #toolbar img {
     position: fixed;
     top: 4px;
-    right: 0;
+    right: 4px;
     height: 64px;
 }
 
@@ -44,6 +49,7 @@ body * {
     bottom: 8px;
     z-index: 3;
     font-size: 12px;
+    user-select: none;
 }
 
 #info {
@@ -108,6 +114,7 @@ body * {
     padding: 16px;
     opacity: 1;
     transition: ease-in-out 0.5s;
+    user-select: none;
 }
 
 #import-export.hidden {

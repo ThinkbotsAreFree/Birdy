@@ -9,7 +9,6 @@
   -webkit-font-smoothing: antialiased;
   min-height: 100%;
   min-width: 100%;
-  color: #333;
 }
 
 #bigpicture {
@@ -27,13 +26,15 @@
   word-wrap: break-word;
   white-space: pre;
   transition-duration: inherit;
+  color: #404040;
+  text-shadow: 0 0 5px hsl(51, 10%, 74%);
 }
 
 .notransition {
   transition-duration: 0s;
 }
 
-.noselect {
+.noselect, .drag-no-select {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;

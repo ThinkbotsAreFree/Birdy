@@ -16,7 +16,9 @@ var sys = {
     todo: [],
     newBorn: [],
     status: "Paused",
-    screen: {}
+    screen: {},
+    maxStep: 1000,
+    stepCount: 0
 };
 
 
@@ -388,6 +390,8 @@ sys.step = function (keepRunning, forever, ui) {
 
     sys.todo = JSON.parse(JSON.stringify(unit.AST.commands));
 
+    sys.stepCount = 0;
+
     while (sys.todo.length > 0) {
 
         var doing = sys.todo.shift();
@@ -616,9 +620,13 @@ sys.execute = {
     '€': function (unit, doing) { // execute variable
 
         var program = unit.localVar[unit.getTargetVariable(doing.id)].concat(doing.arg);
-        var parsed = totalParser.parse(commentParser.parse("| dummy " + program.join(' ')));
-
-        sys.todo = parsed[0].commands.concat(sys.todo);
+        program = "| dummy " + program.join(' ');
+        var parsed = totalParser.parse(commentParser.parse(program));
+        sys.stepCount++;
+        if (sys.stepCount < sys.maxStep)
+            sys.todo = parsed.units[0].commands.concat(sys.todo);
+        else
+            sys.output("system", "Maximum step count limit (unit "+unit.id+')');
     },
 
 

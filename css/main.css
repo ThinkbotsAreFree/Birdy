@@ -15,6 +15,9 @@ body *::selection {
 #toolbar {
     background: linear-gradient(hsl(356, 47%, 47%), hsl(356, 42%, 37%));
     height: 64px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
     position: fixed;
@@ -49,11 +52,15 @@ body *::selection {
     bottom: 8px;
     z-index: 3;
     font-size: 12px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
 }
 
 #info {
     left: 8px;
+    cursor: default;
 }
 
 #zoom {
@@ -114,7 +121,11 @@ body *::selection {
     padding: 16px;
     opacity: 1;
     transition: ease-in-out 0.5s;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
+    cursor: default;
 }
 
 #import-export.hidden {

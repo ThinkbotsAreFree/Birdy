@@ -44,6 +44,12 @@ var bigpicture = (function () {
 
     $(bp).on('input', '.text', function () { redoSearch = true; });
 
+    function clean() {
+        $(".text").each(function () {
+            $(this).remove();
+        });
+    }
+
     function updateTextPosition(e) {
         e.style.fontSize = $(e).data("size") / current.zoom + 'px';
         e.style.left = ($(e).data("x") - current.x) / current.zoom - bp.x + 'px';
@@ -335,10 +341,12 @@ var bigpicture = (function () {
 
     return {
         newText: newText,
+        clean: clean,
         current: current,
         updateTextPosition: updateTextPosition,
         zoomIn: toolbarZoomIn,
-        zoomOut: toolbarZoomOut
+        zoomOut: toolbarZoomOut,
+        onZoom: onZoom
     };
 
 })();

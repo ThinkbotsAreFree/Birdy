@@ -26,7 +26,7 @@
     </div>
 
     <span id="info">
-        <span id="version">BirdyVM - Version 0.6.0 - </span>
+        <span id="version">BirdyVM - Version 0.6.1 - </span>
         <span id="status">Paused</span>
     </span>
 
@@ -86,10 +86,12 @@
             console.log(layout);
 
             if (!err && layout) {
-                layout = layout.replace(/\[BirdyVM\][^\n]*\n/g, '');
-                importLayout(`[BirdyVM] \\1000\\1000\\30 `+layout);
+                //layout = layout.replace(/\[BirdyVM\] *\\1000\\1000\\30/g, '');
+                //importLayout(`[BirdyVM] \\1000\\1000\\30`);
+                importLayout(layout);
             } else
                 importLayout(`[BirdyVM] \\1000\\1000\\30`);
+
                 /*importLayout(`[BirdyVM] \\1000\\1000\\20 Search: F3 or CTRL+F<br><br>Pan: click and drag<br><br>Move text: CTRL+click and drag<br><br>Zoom In:  PageDown or CTRL+ or<br>          mousewheel or double-click<br><br>Zoom Out: PageUp or CTRL- or<br>          mousewheel or CTRL+double-click<br><br>Biggest picture: F2 (try it twice)<br> \\1200\\950\\10`);*/
 
             if (err) sys.inhibAutoSave = true;

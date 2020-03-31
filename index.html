@@ -26,7 +26,7 @@
     </div>
 
     <span id="info">
-        <span id="version">BirdyVM - Version 0.4.1 - </span>
+        <span id="version">BirdyVM - Version 0.5.0 - </span>
         <span id="status">Paused</span>
     </span>
 
@@ -99,9 +99,16 @@
 
 
 
-        $("#user-input").keypress(function (e) {
+        var cmdHistory = [''];
+        var cmdCurrent = 0;
+
+        $("#user-input").keydown(function (e) {
 
             if (e.which === 13) {
+
+                cmdHistory[0] = $(this).val();
+                cmdHistory.unshift('');
+                cmdCurrent = 0;
 
                 var parsed;
                 try {
@@ -126,6 +133,22 @@
                     if (sys.status === "Paused") sys.step(true, false, true);
                     $(this).val('');
                 }
+            } else if (e.which === 38) {
+
+                if (cmdCurrent < cmdHistory.length-1) {
+                    cmdCurrent++;
+                    $(this).val(cmdHistory[cmdCurrent]);
+                }
+            } else if (e.which === 40) {
+
+                if (cmdCurrent > 0) {
+                    cmdCurrent--;
+                    $(this).val(cmdHistory[cmdCurrent]);
+                }
+            } else if (e.which === 27) {
+
+                cmdCurrent = 0;
+                $(this).val('');
             }
         });
 
@@ -248,13 +271,11 @@
             $("#import-export").addClass("hidden");
             setLayout($("#editor").val());
             $("#editor").val('');
-            
+
             /*setTimeout(function() {
                 $("#import-export")[0].style.display = "none";
             }, 500)*/
         }
-
-
 
     </script>
 </body>

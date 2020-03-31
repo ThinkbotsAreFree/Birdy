@@ -100,10 +100,11 @@ body *::selection {
 }
 
 #cycle {
-    width: 100vw;
+    width: 80vw;
     height: 100vh;
     position: fixed;
-    top: calc(50vh - 50vw);
+    top: calc(50vh - 40vw + 32px);
+    left: 10vw;
     z-index: 4;
     pointer-events: none;
 }

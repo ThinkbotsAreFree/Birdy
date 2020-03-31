@@ -27,7 +27,7 @@
   white-space: pre;
   transition-duration: inherit;
   color: #404040;
-  text-shadow: 0 0 5px hsl(51, 10%, 74%);
+  /*text-shadow: 0 0 5px hsl(51, 10%, 74%);*/
 }
 
 .notransition {

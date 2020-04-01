@@ -27,7 +27,7 @@ sys.output = function (topic, message) {
 
     Toastify({
         text: `<span class="output-topic">${topic} &nbsp </span> `+message,
-        duration: 3000, 
+        duration: 10000, 
         destination: "https://github.com/ThinkbotsAreFree/Birdy",
         newWindow: true,
         close: true,
@@ -131,7 +131,7 @@ sys.kill = function(id) {
 
 
 Unit.prototype.performSubstitution = function (line) {
-
+console.log("[line]", line);
     if (!Array.isArray(line)) return line;
 
     var result = [];
@@ -185,6 +185,7 @@ sys.populate = function (source, uiElement) {
     try {
         parsed = totalParser.parse(commentParser.parse(source));
     } catch(e) {
+        //console.error(e);
     }
 
     if (parsed) {
@@ -578,7 +579,9 @@ sys.execute = {
 
     '&': function (unit, doing) { // eval scheme
 
-        var expr = '('+doing.arg.join(' ')+')';
+        var expr = doing.arg.join(' ');
+
+        console.log(doing.arg);
 
         unit.setVariables({ ['#' + doing.id]: biwaScheme.evaluate(expr) });
     },
@@ -659,7 +662,10 @@ sys.execute = {
 
 sys.setLine = function (rawline, fruit, tree) {
 
-    var line = ['→'].concat(rawline).concat(['←']);
+    var line = (rawline[0] === '(' && rawline[rawline.length-1] === ')') ?
+        rawline : ['→'].concat(rawline).concat(['←']);
+
+    line = rawline;
 
     var cursor = tree,
         parent;
@@ -685,8 +691,11 @@ sys.setLine = function (rawline, fruit, tree) {
 
 sys.removeLine = function (rawline, tree) {
 
-    var line = ['→'].concat(rawline).concat(['←']);
+    var line = (rawline[0] === '(' && rawline[rawline.length-1] === ')') ?
+        rawline : ['→'].concat(rawline).concat(['←']);
 
+    line = rawline;
+    
     var cursor = tree;
 
     while (line.length) {
@@ -709,12 +718,16 @@ sys.query = function (line, cursor) {
     var found;
     var level = 0;
 
+    //console.log("[start]", line);
     if (line.length > 1) {
 
+        //console.log("[cursor]", cursor);
         if (cursor[line[0]]) found = sys.query(line.slice(1), cursor[line[0]].branch);
+        //console.log("[found 1]", found);
         if (found) return found;
 
         if (cursor['?']) found = sys.query(line.slice(1), cursor['?'].branch);
+        //console.log("[found 2]", found);
         if (found) return found;
 
         if (cursor['*']) while (!found && line.length > 0) {
@@ -723,15 +736,18 @@ sys.query = function (line, cursor) {
                 if (line[0] === '(') level += 1;
                 if (line[0] === ')') level -= 1;
                 sys.capture[cursor['*'].item].push(line[0]);
+                //console.log("[line]", line);
                 line.shift();
             }
             sys.capture[cursor['*'].item].push(line[0]);
+            //console.log("[capture]", sys.capture);
             line.shift();
             found = sys.query(line, cursor['*'].branch);
         }
         if (found) return found;
         if (cursor['*']) return cursor['*'].fruit;
 
+        //console.log("[undefined return]");
         return undefined;
     }
     if (cursor[line[0]]) return cursor[line[0]].fruit;
@@ -745,10 +761,12 @@ sys.queryLine = function (rawline, tree) {
 
     sys.capture = {};
 
-    var line = ['→'].concat(rawline).concat(['←']);
+    var line = (rawline[0] === '(' && rawline[rawline.length-1] === ')') ?
+        rawline : ['→'].concat(rawline).concat(['←']);
 
     var result = sys.query(line.slice(0), tree);
 
+    //console.log("[result]", result);
     return result;
 };
 
@@ -761,6 +779,11 @@ sys.match = function (message, pattern) {
     sys.setLine(pattern, true, tmpTree);
 
     var result = sys.queryLine(message, tmpTree);
+
+    for (let c in sys.capture) {
+        if (sys.capture[c][0] === '→') sys.capture[c].shift();
+        if (sys.capture[c][sys.capture[c].length-1] === '←') sys.capture[c].pop();
+    }
 
     return result ? sys.capture : false;
 }

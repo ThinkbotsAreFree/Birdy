@@ -9,6 +9,7 @@
  * url:     http://github.com/josephernest/bigpicture.js
  *
  */
+const zoomFactor = 1.5;
 
 var bigpicture = (function () {
     "use strict";
@@ -180,7 +181,7 @@ var bigpicture = (function () {
 
     bpContainer.ondblclick = function (e) {
         e.preventDefault();
-        onZoom((e.ctrlKey || e.metaKey) ? current.zoom * 1.7 * 1.7 : current.zoom / 1.7 / 1.7, current.x + e.clientX * current.zoom, current.y + e.clientY * current.zoom, e.clientX, e.clientY);
+        onZoom((e.ctrlKey || e.metaKey) ? current.zoom * zoomFactor * zoomFactor : current.zoom / zoomFactor / zoomFactor, current.x + e.clientX * current.zoom, current.y + e.clientY * current.zoom, e.clientX, e.clientY);
     };
 
     var biggestPictureSeen = false,
@@ -291,7 +292,7 @@ var bigpicture = (function () {
             last_e = e;
             if (!mousewheeltimer) {
                 mousewheeltimer = setTimeout(function () {
-                    onZoom((mousewheeldelta > 0) ? current.zoom / 1.7 : current.zoom * 1.7, current.x + last_e.clientX * current.zoom, current.y + last_e.clientY * current.zoom, last_e.clientX, last_e.clientY);
+                    onZoom((mousewheeldelta > 0) ? current.zoom / zoomFactor : current.zoom * zoomFactor, current.x + last_e.clientX * current.zoom, current.y + last_e.clientY * current.zoom, last_e.clientX, last_e.clientY);
                     mousewheeldelta = 0;
                     mousewheeltimer = null;
                 }, 70);
@@ -302,7 +303,7 @@ var bigpicture = (function () {
         mousewheel = function (e) {
             e.preventDefault();
             var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-            onZoom((delta > 0) ? current.zoom / 1.7 : current.zoom * 1.7, current.x + e.clientX * current.zoom, current.y + e.clientY * current.zoom, e.clientX, e.clientY);
+            onZoom((delta > 0) ? current.zoom / zoomFactor : current.zoom * zoomFactor, current.x + e.clientX * current.zoom, current.y + e.clientY * current.zoom, e.clientX, e.clientY);
         };
     }
 
@@ -319,13 +320,13 @@ var bigpicture = (function () {
         if (((e.ctrlKey && !e.altKey || e.metaKey) && (e.keyCode == 61 || e.keyCode == 187 || e.keyCode == 171 || e.keyCode == 107 || e.key == '+' || e.key == '='))   // CTRL+PLUS or COMMAND+PLUS 
             || e.keyCode == 34) {   // PAGE DOWN     // !e.altKey to prevent catching of ALT-GR 
             e.preventDefault();
-            onZoom(current.zoom / 1.7);
+            onZoom(current.zoom / zoomFactor);
             return;
         }
         if (((e.ctrlKey && !e.altKey || e.metaKey) && (e.keyCode == 54 || e.keyCode == 189 || e.keyCode == 173 || e.keyCode == 167 || e.keyCode == 109 || e.keyCode == 169 || e.keyCode == 219 || e.key == '-'))   // CTRL+MINUS or COMMAND+MINUS
             || e.keyCode == 33) {   // PAGE UP
             e.preventDefault();
-            onZoom(current.zoom * 1.7);
+            onZoom(current.zoom * zoomFactor);
             return;
         }
         if ((e.ctrlKey && !e.altKey || e.metaKey) && e.keyCode == 70) {         // CTRL+F
@@ -348,12 +349,12 @@ var bigpicture = (function () {
 
 
     function toolbarZoomIn() {
-        onZoom(current.zoom / 1.7);
+        onZoom(current.zoom / zoomFactor);
     }
 
 
     function toolbarZoomOut() {
-        onZoom(current.zoom * 1.7);
+        onZoom(current.zoom * zoomFactor);
     }
 
 

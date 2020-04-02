@@ -50,7 +50,7 @@ var bigpicture = (function () {
         });
     }
 
-    function addAppropriateStyle(e) {
+    function addAppropriateStyle(e, inhib) {
 
         var content = e.innerHTML.trim();
         if (content[0] === '|') {
@@ -69,7 +69,7 @@ var bigpicture = (function () {
             $(e).addClass("red");
             e.style["border-top"] = $(e).data("size")/4/current.zoom+"px solid #FFE64D";
         }
-        $(e).html(content);
+        if (!inhib) $(e).html(content);
     }
 
     function updateTextPosition(e) {
@@ -99,7 +99,7 @@ var bigpicture = (function () {
         }
 
         $(tb).on("input", function(ev) {
-            addAppropriateStyle(ev.target);
+            addAppropriateStyle(ev.target, true);
             var jqtb = $(ev.target);
             var units = jqtb.data("units");
             if (units) {

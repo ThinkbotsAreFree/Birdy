@@ -722,6 +722,9 @@ screenParser = /*
                   s9 = peg$parse_();
                   if (s9 !== peg$FAILED) {
                     s10 = peg$parseTemplate();
+                    if (s10 === peg$FAILED) {
+                      s10 = null;
+                    }
                     if (s10 !== peg$FAILED) {
                       s4 = [s4, s5, s6, s7, s8, s9, s10];
                       s3 = s4;

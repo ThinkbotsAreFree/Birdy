@@ -4,7 +4,12 @@
 
 var sys = {
     unit: {},
-    category: {},
+    categoryTemplate: {},
+    categoryPattern: {
+        children: {},
+        wildcards: {},
+        leaves: []
+    },
     delivery: {
         children: {},
         wildcards: {},
@@ -210,7 +215,16 @@ sys.createUnit = function (AST, id, uiElement) {
 
 sys.createCategory = function (def) {
 
-    sys.setLine(def.pattern, def.template, sys.category);
+    var id = sys.newId();
+
+    sys.delPath(id, def.pattern, sys.categoryPattern);
+    delete sys.categoryTemplate[id];
+
+    if (def.template !== null) {
+
+        sys.newPath(id, def.pattern, sys.categoryPattern);
+        sys.categoryTemplate[id] = def.template;
+    }
 };
 
 
@@ -237,6 +251,8 @@ sys.newPath = function (id, path, node) {
 
 
 sys.delPath = function (id, path, node) {
+
+    if (!node) return;
 
     if (path.length > 0) {
 
@@ -275,12 +291,14 @@ sys.isBalanced = function (chain) {
 
 
 
-sys.getDeliveryPlan = function (channel) {
+sys.getDeliveryPlan = function (channel, tree) {
+
+    tree = tree || sys.delivery;
 
     sys.delivering = {};
     sys.deliveryFound = 0;
 
-    sys.buildDeliveryPlan(channel, sys.delivery, '{');
+    sys.buildDeliveryPlan(channel, tree, '{');
 
     return sys.delivering;
 };
@@ -565,14 +583,37 @@ sys.execute = {
 
     ':': function (unit, doing) { // get match
 
-        var msg = sys.queryLine(doing.arg, sys.category);
+        var result = JSON.parse(JSON.stringify(doing.arg));
 
-        var localVar = JSON.stringify(unit.localVar);
-        unit.setVariables(sys.capture);
-        msg = unit.performSubstitution(msg);
-        unit.localVar = JSON.parse(localVar);
+        var relevantPatterns = sys.getDeliveryPlan(result, sys.categoryPattern);
 
-        unit.setVariables({ ['#' + doing.id]: msg });
+        var stepCount = 0;
+
+        while (Object.keys(relevantPatterns).length > 0 && stepCount < sys.maxStep) {
+
+            var n = Math.floor(Math.random()*Object.keys(relevantPatterns).length);
+            var templateId = Object.keys(relevantPatterns)[n];
+            var captures = relevantPatterns[templateId];
+            var template = sys.categoryTemplate[templateId];
+
+            result = template.map(item => {
+                if (item[0] === '$') return captures['#'+item.slice(1)];
+                else return item;
+            });
+
+            result = [];
+
+            for (let item of template)
+                if (item[0] === '$')
+                    result = result.concat(captures['#'+item.slice(1)]);
+                else
+                    result.push(item);
+
+            relevantPatterns = sys.getDeliveryPlan(result, sys.categoryPattern);
+            stepCount++;
+        }
+
+        unit.setVariables({ ['#' + doing.id]: result });
     },
 
 
@@ -660,132 +701,92 @@ sys.execute = {
 
 
 
-sys.setLine = function (rawline, fruit, tree) {
-
-    var line = (rawline[0] === '(' && rawline[rawline.length-1] === ')') ?
-        rawline : ['→'].concat(rawline).concat(['←']);
-
-    line = rawline;
-
-    var cursor = tree,
-        parent;
-
-    var itemId = 1;
-
-    line.forEach(item => {
-
-        var token = (item[0] === '#') ? '*' : item;
-        if (!cursor[token]) cursor[token] = {
-            branch: {},
-            count: 0,
-            item: (item === '*' || item === '?') ? '#' + (itemId++) : item
-        };
-        parent = cursor[token];
-        cursor[token].count += 1;
-        cursor = cursor[token].branch;
-    });
-    parent.fruit = fruit;
-};
-
-
-
-sys.removeLine = function (rawline, tree) {
-
-    var line = (rawline[0] === '(' && rawline[rawline.length-1] === ')') ?
-        rawline : ['→'].concat(rawline).concat(['←']);
-
-    line = rawline;
-    
-    var cursor = tree;
-
-    while (line.length) {
-
-        if (cursor[line[0]].count == 1) {
-            delete cursor[line[0]];
-            line = [];
-        } else {
-            cursor[line[0]].count -= 1;
-            cursor = cursor[line[0]].branch;
-            line.shift();
-        }
-    }
-};
-
-
-
-sys.query = function (line, cursor) {
-
-    var found;
-    var level = 0;
-
-    //console.log("[start]", line);
-    if (line.length > 1) {
-
-        //console.log("[cursor]", cursor);
-        if (cursor[line[0]]) found = sys.query(line.slice(1), cursor[line[0]].branch);
-        //console.log("[found 1]", found);
-        if (found) return found;
-
-        if (cursor['?']) found = sys.query(line.slice(1), cursor['?'].branch);
-        //console.log("[found 2]", found);
-        if (found) return found;
-
-        if (cursor['*']) while (!found && line.length > 0) {
-            if (!sys.capture[cursor['*'].item]) sys.capture[cursor['*'].item] = [];
-            while (line.length > 0 && (line[0] === '(' || line[0] === ')' || level > 0)) {
-                if (line[0] === '(') level += 1;
-                if (line[0] === ')') level -= 1;
-                sys.capture[cursor['*'].item].push(line[0]);
-                //console.log("[line]", line);
-                line.shift();
-            }
-            sys.capture[cursor['*'].item].push(line[0]);
-            //console.log("[capture]", sys.capture);
-            line.shift();
-            found = sys.query(line, cursor['*'].branch);
-        }
-        if (found) return found;
-        if (cursor['*']) return cursor['*'].fruit;
-
-        //console.log("[undefined return]");
-        return undefined;
-    }
-    if (cursor[line[0]]) return cursor[line[0]].fruit;
-    if (cursor['?']) return cursor['?'].fruit;
-    if (cursor['*']) return cursor['*'].fruit;
-}
-
-
-
-sys.queryLine = function (rawline, tree) {
-
-    sys.capture = {};
-
-    var line = (rawline[0] === '(' && rawline[rawline.length-1] === ')') ?
-        rawline : ['→'].concat(rawline).concat(['←']);
-
-    var result = sys.query(line.slice(0), tree);
-
-    //console.log("[result]", result);
-    return result;
-};
-
-
-
 sys.match = function (message, pattern) {
 
-    var tmpTree = {};
-
-    sys.setLine(pattern, true, tmpTree);
-
-    var result = sys.queryLine(message, tmpTree);
-
-    for (let c in sys.capture) {
-        if (sys.capture[c][0] === '→') sys.capture[c].shift();
-        if (sys.capture[c][sys.capture[c].length-1] === '←') sys.capture[c].pop();
-    }
-
-    return result ? sys.capture : false;
+    return matcher.match(message.join(' '), pattern.join(' '));
 }
 
+	
+	
+var matcher = {
+		
+    match: function(tame, wild) {
 
+        matcher.results = {};
+        matcher.parenLevel = 0;
+        return matcher.trySection(tame,patternCut.parse(wild)) ? matcher.results : false;
+    },
+    
+    pushResult: function(capture,sections) {
+
+        for (var w=0; w<sections[0].wildcards.length; w++) {
+        
+            matcher.results['#'+sections[0].wildcards[w]] = capture;
+        }
+    },
+    
+    trySection: function(tame,sections) {
+    
+        var wild = sections[0].constant;
+        
+        if (wild == '') {
+        
+            matcher.pushResult(tame,sections);
+            return true;
+        }
+        
+        var entryPoints = [];
+        var originalParenLevel = matcher.parenLevel;
+        
+        if (sections[0].wildcards.length > 0) {
+        
+            var underZero = false;
+            
+            for (var t=0; t<tame.length; t++) {
+
+                if (tame[t] == '(') matcher.parenLevel++;
+                if (tame[t] == ')') matcher.parenLevel--;
+            
+                if (matcher.parenLevel < 0) underZero = true;
+            
+                if ((matcher.parenLevel == originalParenLevel)
+                    && (tame[t] == wild[0])
+                    && (!underZero)) {
+                
+                    entryPoints.push(t);
+                    underZero = false;
+                }
+            }
+            
+        } else {
+        
+            entryPoints = [0];
+        
+        }
+        
+        var ep=0;
+        while (ep < entryPoints.length) {
+        
+            if (tame.substring(entryPoints[ep],entryPoints[ep]+wild.length)==wild) {
+            
+                matcher.pushResult(tame.substring(0,entryPoints[ep]),sections);
+            
+                if (sections.length == 1) {
+                
+                    if (tame.length-entryPoints[ep] == wild.length) return true;
+                
+                } else {
+                
+                    if (matcher.trySection(
+                        tame.substring(entryPoints[ep]+wild.length),
+                        sections.slice(1,sections.length))) {
+                    
+                        return true;
+                    }
+                }
+            }
+            ep++;
+        }
+        return false;
+    }
+}

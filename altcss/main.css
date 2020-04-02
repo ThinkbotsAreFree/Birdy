@@ -66,6 +66,7 @@ body *::selection {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    color: #808080;
 }
 
 #info {

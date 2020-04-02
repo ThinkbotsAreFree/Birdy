@@ -50,10 +50,29 @@ var bigpicture = (function () {
         });
     }
 
+    function addAppropriateStyle(e) {
+
+        var content = e.innerHTML.trim();
+        if (content[0] === '|') {
+            $(e).addClass("matrix");
+            e.style["border-top"] = $(e).data("size")/4/current.zoom+"px solid #0CCD58";
+        } else
+        if (content[0] === '¤') {
+            $(e).addClass("tron");
+            e.style["border-top"] = $(e).data("size")/4/current.zoom+"px solid #6FC3EF";
+        } else {
+            $(e).addClass("red");
+            e.style["border-top"] = $(e).data("size")/4/current.zoom+"px solid #FFE64D";
+        }
+        $(e).html(content);
+    }
+
     function updateTextPosition(e) {
         e.style.fontSize = $(e).data("size") / current.zoom + 'px';
         e.style.left = ($(e).data("x") - current.x) / current.zoom - bp.x + 'px';
         e.style.top = ($(e).data("y") - current.y) / current.zoom - bp.y + 'px';
+
+        addAppropriateStyle(e);
     }
 
     function newText(x, y, size, text, inhib) {
@@ -107,6 +126,7 @@ var bigpicture = (function () {
         if ($(e.target).hasClass('text') && (e.ctrlKey || e.metaKey)) {
             movingText = e.target;
             movingText.className = "text noselect notransition";
+            addAppropriateStyle(movingText);
         }
         else {
             movingText = null;
@@ -118,7 +138,10 @@ var bigpicture = (function () {
 
     window.onmouseup = function () {
         dragging = false;
-        if (movingText) { movingText.className = "text"; }
+        if (movingText) {
+            movingText.className = "text";
+            addAppropriateStyle(movingText);
+        }
         movingText = null;
     };
 

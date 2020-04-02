@@ -3,9 +3,9 @@
   overflow: hidden;
   position: fixed;
   top: 0;
-  background: hsl(51, 10%, 74%);
-  background: radial-gradient(hsl(51, 10%, 94%) 0%, hsl(52, 10%, 88%) 40%, hsl(54, 5%, 73%) 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d5cea6', endColorstr='#b7ad70', GradientType=0);
+  background: black;
+  background: url('../images/electro.jpeg') no-repeat fixed center;
+  background-size: cover;
   -webkit-font-smoothing: antialiased;
   min-height: 100%;
   min-width: 100%;
@@ -17,8 +17,8 @@
 }
 
 .text {
-  font-family: RobotoLight;
-  line-height: 1.1;
+  font-family: Sharetech;
+  line-height: 1.5;
   outline: 0;
   position: absolute;
   min-width: 2px;
@@ -26,8 +26,28 @@
   word-wrap: break-word;
   white-space: pre;
   transition-duration: inherit;
-  color: #404040;
-  border: none !important;
+  padding: 0 0.5em;
+}
+
+.matrix {
+  border-top: 5px solid #0CCD58;
+  background: rgba(0, 255, 34, 0.06);
+  color: #DFEFE2;
+  text-shadow: 0px 0px 16px #0CCD58;
+}
+
+.tron {
+  border-top: 5px solid #6FC3EF;
+  background: rgba(99, 165, 255, 0.12);
+  color: #E6FFFF;
+  text-shadow: 0px 0px 16px #6FC3EF;
+}
+
+.red {
+  border-top: 5px solid #FFE64D;
+  background: rgba(255, 0, 0, 0.13);
+  color: #FFE64D;
+  text-shadow: 0px 0px 16px #DF740C;    
 }
 
 .notransition {

@@ -5,10 +5,10 @@
     <meta charset="utf-8">
     <title>BirdyVM</title>
     <script type="text/javascript" src="js/jquery.min.js"></script>
-    <link href="css/normalize.css" rel="stylesheet">
-    <link href="css/bigpicture.css" rel="stylesheet">
-    <link href="css/toastify.min.css" rel="stylesheet">
-    <link href="css/main.css" rel="stylesheet">
+    <link href="altcss/normalize.css" rel="stylesheet">
+    <link href="altcss/bigpicture.css" rel="stylesheet">
+    <link href="altcss/toastify.min.css" rel="stylesheet">
+    <link href="altcss/main.css" rel="stylesheet">
 </head>
 
 <body>
@@ -22,11 +22,11 @@
         <button onclick="importLayout()">Import Layout</button>
         <button onclick="exportLayout()">Export Layout</button>
         <input id="user-input" type="text" placeholder="cmd">
-        <img src="images/birdy-transparent.png">
+        <img src="images/birdy-transparent.png" onclick="switchSkin()">
     </div>
 
     <span id="info">
-        <span id="version">BirdyVM - Version 0.6.4 - </span>
+        <span id="version">BirdyVM - Version 0.7.0 - </span>
         <span id="status">Paused</span>
     </span>
 
@@ -66,6 +66,22 @@
 
     <script>
 
+
+        var skin = true;
+
+        function switchSkin() {
+
+            if (skin) {
+                
+                document.head.innerHTML = document.head.innerHTML.replace(/href="altcss\//g, 'href="css/');
+
+            } else {
+
+                document.head.innerHTML = document.head.innerHTML.replace(/href="css\//g, 'href="altcss/');
+            }
+
+            skin = !skin; console.log(skin);
+        }
 
 
         new ClipboardJS('#copy');

@@ -54,13 +54,18 @@ var bigpicture = (function () {
 
         var content = e.innerHTML.trim();
         if (content[0] === '|') {
+            $(e).removeClass("tron");
+            $(e).removeClass("red");
             $(e).addClass("matrix");
             e.style["border-top"] = $(e).data("size")/4/current.zoom+"px solid #0CCD58";
         } else
         if (content[0] === '¤') {
+            $(e).removeClass("matrix");
             $(e).addClass("tron");
             e.style["border-top"] = $(e).data("size")/4/current.zoom+"px solid #6FC3EF";
         } else {
+            $(e).removeClass("matrix");
+            $(e).removeClass("tron");
             $(e).addClass("red");
             e.style["border-top"] = $(e).data("size")/4/current.zoom+"px solid #FFE64D";
         }
@@ -86,6 +91,7 @@ var bigpicture = (function () {
         $(tb).data("x", x).data("y", y).data("size", size);
         updateTextPosition(tb);
         bp.appendChild(tb);
+        addAppropriateStyle(tb);
         sys.populate($(tb).text());
         $(tb).data("units", sys.newBorn.join(','));
         for (let u of sys.newBorn) {
@@ -93,6 +99,7 @@ var bigpicture = (function () {
         }
 
         $(tb).on("input", function(ev) {
+            addAppropriateStyle(ev.target);
             var jqtb = $(ev.target);
             var units = jqtb.data("units");
             if (units) {

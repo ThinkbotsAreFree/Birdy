@@ -131,7 +131,7 @@ sys.kill = function(id) {
 
 
 Unit.prototype.performSubstitution = function (line) {
-console.log("[line]", line);
+
     if (!Array.isArray(line)) return line;
 
     var result = [];
@@ -581,7 +581,7 @@ sys.execute = {
 
         var expr = doing.arg.join(' ');
 
-        console.log(doing.arg);
+        //console.log(doing.arg);
 
         unit.setVariables({ ['#' + doing.id]: biwaScheme.evaluate(expr) });
     },

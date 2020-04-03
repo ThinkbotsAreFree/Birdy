@@ -26,7 +26,7 @@
     </div>
 
     <span id="info">
-        <span id="version">BirdyVM - Version 0.7.4 - </span>
+        <span id="version">BirdyVM - Version 0.7.5 - </span>
         <span id="status">Paused</span>
     </span>
 
@@ -319,6 +319,7 @@
             function (event) {
                 if (event.which == '13') {
                     event.preventDefault();
+                    $("#user-input")[0].focus();
                 }
             }
         );

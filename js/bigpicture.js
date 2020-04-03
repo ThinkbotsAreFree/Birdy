@@ -51,26 +51,30 @@ var bigpicture = (function () {
         });
     }
 
-    function addAppropriateStyle(e, inhib) {
+    function addAppropriateStyle(e, inhibText, inhibClass) {
 
         var content = e.innerHTML.trim();
         if (content[0] === '|') {
-            $(e).removeClass("tron");
-            $(e).removeClass("red");
-            $(e).addClass("matrix");
-            e.style["border-top"] = $(e).data("size")/4/current.zoom+"px solid #0CCD58";
+            if (!inhibClass) {
+                $(e).removeClass("tron");
+                $(e).addClass("matrix");
+            }
+            e.style["border-top"] = $(e).data("size")/6/current.zoom+"px solid #0CCD58";
         } else
         if (content[0] === '¤') {
-            $(e).removeClass("matrix");
-            $(e).addClass("tron");
-            e.style["border-top"] = $(e).data("size")/4/current.zoom+"px solid #6FC3EF";
+            if (!inhibClass) {
+                $(e).removeClass("matrix");
+                $(e).addClass("tron");
+            }
+            e.style["border-top"] = $(e).data("size")/6/current.zoom+"px solid #6FC3EF";
         } else {
-            $(e).removeClass("matrix");
-            $(e).removeClass("tron");
-            $(e).addClass("red");
-            e.style["border-top"] = $(e).data("size")/4/current.zoom+"px solid #FFE64D";
+            if (!inhibClass) {
+                $(e).removeClass("matrix");
+                $(e).removeClass("tron");
+            }
+            e.style["border-top"] = $(e).data("size")/6/current.zoom+"px solid #FFE64D";
         }
-        if (!inhib) $(e).html(content);
+        if (!inhibText) $(e).html(content);
     }
 
     function updateTextPosition(e) {
@@ -78,7 +82,7 @@ var bigpicture = (function () {
         e.style.left = ($(e).data("x") - current.x) / current.zoom - bp.x + 'px';
         e.style.top = ($(e).data("y") - current.y) / current.zoom - bp.y + 'px';
 
-        addAppropriateStyle(e);
+        addAppropriateStyle(e, false, true);
     }
 
     function newText(x, y, size, text, inhib) {

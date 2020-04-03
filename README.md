@@ -323,7 +323,7 @@ This would output `Hi there!`
 
 ## The String Rewriting System
 
-BirdyVM has a global SRS made of **rules**. These rules are defined with a currency sign `¤` followed by a pattern, a slash character `/`, and a reponse template.
+BirdyVM has a global SRS made of **rules**. These rules are defined with a currency sign `¤` followed by a pattern, a slash character `/`, and a response template.
 
 Here is an example of a complete definition of a rule.
 
@@ -338,7 +338,7 @@ A call is made with the "call SRS" command `:1`, which is used a bit like the "s
 ```
 The example above would store the value `Why am I so happy` in the local variable `e`.
 
-Rules are inspired from chatbot engines like Rivescript or AIML, and even though this description is short (because BirdyVM's rules are a simple mechanism), their importance shouldn't be underestimated.
+Rules are inspired from [Thue](https://esolangs.org/wiki/Thue), and even though this description is short (because BirdyVM's rules are a simple mechanism), their importance shouldn't be underestimated.
 
 Indeed, units and rules are like two sides of the coin.
 

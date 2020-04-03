@@ -83,7 +83,7 @@ From these examples, generalized schemas could be extracted, and once extracted 
 
 Then top-down begins, with the design of a handful of big "lobes", each of which has a precise but wide field of responsabilities. Then in each lobe, sub-lobes, or "lobules" can be designed with smaller fields and more proactive effects on the system.
 
-These recursive steps borrow from the Agile world, which is particularly welcome here. Test every now and then, test, test, and test again. It's probably a never-ending job, because a mind is a big thing.
+These recursive steps borrow from the Agile world, which is particularly welcome here. Start small to get a minimal but functional product quickly, and start from there. Test every now and then, test, test, and test again, receive feedback from the users and keep adding functionalities as you go. It's probably a never-ending job, because a mind is a big thing.
 
 Be careful if you use automatic content generator.
 

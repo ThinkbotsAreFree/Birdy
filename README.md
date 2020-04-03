@@ -65,9 +65,9 @@ I strongly believe that learning is overrated in the Ai field. Yes, children do 
 
 Pattern matching is central. More precisely, given a situation, the whole system should adapt and react, each module doing its share. In AIML-style chatbots, one line is dispatched through a "graphmaster" tree, to reach one single reaction, typically the reply to the user. The big idea of BirdyVM is to broadcast a line through the tree to *every* interested endpoints. At each node, instead of choosing one best child, all eligible children receive of copy of the message.
 
-Another difference with classical chatbot engines is that BirdyVM is not a one-shot REPL, but an event loop. The system is meant to run continuously, reacting to external/internal events as they occur. To me, it more like what's in a human mind, which is never empty between two interactions. It can therefore be plugged in a robot's body quite naturally.
+Another difference with classical chatbot engines is that BirdyVM is not a one-shot REPL, but an event loop. The system is meant to run continuously, reacting to external/internal events as they occur. To me, it's more like what's in a human mind, which is never empty between two interactions. It can therefore be plugged in a robot's body quite naturally.
 
-A major advantage in this architecture is the opportunity to describe structures of communicating modules where thought flow. It follows the Keep It Simple way of doing things. Ai should be a people's thing, not a corporation's thing. In BirdyVM, you create the mind of the bot at the highest level: the level you'd use to describe it orally to somebody. The way you'd describe it to someone else, is the very way you design your rules and units, with words and sentences.
+A major advantage of this architecture is the opportunity to describe directly the structures of communicating modules where thoughts flow. It follows the Keep It Simple way of doing things. Ai should be a people's thing, not a corporation's thing. In BirdyVM, you create the mind of the bot at the highest level: the level you'd use to describe it orally to somebody. The way you'd describe it to someone else, is the very way you design your rules and units, with words and sentences.
 
 Consciousness is more than the inner discourse most of us humans experience everyday, but inner discourse is still the most obvious manifestation of our thinking processes. BirdyVM let's you create interacting inner discourse generators.
 
@@ -77,29 +77,29 @@ Right now, only a Javascript prototype has been implemented. It is not a good to
 
 On a serious implementation, say in Rust or Go, pluggable in usual channels (social, websites, apps, ...etc.), additional tools would be needed to author bots. Assuming these tools exist, a simple design strategy would be to start bottom-up.
 
-Beginning with a few brainstorming session, the first step would be to produce a quantity of examples of situations and associated thought-trains that you want in the bot.
+Beginning with a few brainstorming sessions, the first step would be to produce a quantity of examples of situations and associated thought-trains that you want the bot to show.
 
 From these examples, generalized schemas could be extracted, and once extracted they could be enriched with additional functionalities and edge cases.
 
-Then top-down begins, with the design of a handful of big "lobes", each of which has a precise but wide field of responsability. Then in each lobe, sub-lobes, or "lobules" can be designed with smaller fields and more proactive effects on the system.
+Then top-down begins, with the design of a handful of big "lobes", each of which has a precise but wide field of responsabilities. Then in each lobe, sub-lobes, or "lobules" can be designed with smaller fields and more proactive effects on the system.
 
 These recursive steps borrow from the Agile world, which is particularly welcome here. Test every now and then, test, test, and test again. It's probably a never-ending job, because a mind is a big thing.
 
 Be careful if you use automatic content generator.
 
-#### what considerations would enter into the allocation of functionality to different agents, or the selection of pre-built agents from a library?
+#### What considerations would enter into the allocation of functionality to different agents, or the selection of pre-built agents from a library?
 
 Agents are really *really* small, compared to what you're probably used to, typically down to a pattern match and one or two actions. So I don't think the designer should think in terms of functionalities allocated to an agent, but rather allocated to a *community* of agents.
 
-A good desing involves two kinds of agents communities. There are general purpose "conceptual" communities, and real world "instantial" communities.
-- An example of conceptual agent community would be a natural language generation module. Given a structured info to communicate, its job is to build a natural language sentence out of it, following appropriate grammar rules.
-- An example of instantial community would be a community of agents storing and handling everything about a particular employee of your company.
+A good design involves two kinds of agents communities. There are general purpose "conceptual" communities, and real world "instantial" communities.
+- An example of conceptual agent community would be a natural language generation module. Given a structured info to communicate, its job is to build a natural language sentence out of it, following appropriate grammar rules and linguistic style.
+- An example of instantial community would be a community of agents storing and handling everything about a particular employee of your company. Don't see it as a database though: it is rather a set of reflexes associated and adapted to a specific instance.
 
 Communities of agents, both conceptual and instantial, are of course good candidates for sharing and reusing code, by storing them in libraries. At this point however, the possibity to export and import libraries has not been fully explored / implemented. 
 
 #### What kinds of messages might agents want to pass to each other?
 
-Simple messages. Messages are structured, thanks to parentheses-sensitivity pattern matching (that handles nesting correctly), but I believed they should remain simple.
+Simple messages. Messages are structured, thanks to parentheses-sensitivity pattern matching (that handles nesting correctly), but I believe they should remain simple.
 
 One message should convey only 1 information. If you have several things to say, send several messages.
 

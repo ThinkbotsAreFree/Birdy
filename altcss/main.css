@@ -88,7 +88,7 @@ body *::selection {
 #user-input {
     background: #333;
     border: none;
-    border-bottom: 1px solid hsl(356, 47%, 87%);
+    border-bottom: 1px solid rgb(116, 116, 116);
     line-height: 32px;
     position: relative;
     top: -6px;

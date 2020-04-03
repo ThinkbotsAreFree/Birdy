@@ -32,7 +32,7 @@ sys.output = function (topic, message) {
 
     Toastify({
         text: `<span class="output-topic">${topic} &nbsp </span> `+message,
-        duration: 10000, 
+        duration: 5000, 
         destination: "https://github.com/ThinkbotsAreFree/Birdy",
         newWindow: true,
         close: true,
@@ -362,7 +362,7 @@ sys.showMessage = function(unit) {
 
     setTimeout(new Function(`
         document.getElementById("${msgId}").outerHTML = '';
-    `), 1000);
+    `), 2500);
 }
 
 
@@ -382,7 +382,7 @@ sys.step = function (keepRunning, forever, ui) {
     if (ui) {
         $("#status").html("Running");
         sys.status = "Running";
-        if (ui.innerHTML) sys.output('ui', ui.innerHTML);
+        if (ui.innerHTML) sys.output('ui', ui.innerText);
     }
 
     if (forever || (keepRunning && sys.jobQueue.length > 0)) {
@@ -677,7 +677,9 @@ sys.execute = {
 
     '*': function (unit, doing) { // create units
 
-        sys.populate(doing.arg.join(' '));
+        var uel = $('#'+unit.ui);
+
+        insertText(uel, doing.arg.join(' '))
     },
 
 
@@ -789,4 +791,26 @@ var matcher = {
         }
         return false;
     }
+}
+
+
+
+function insertText(uel, txt) {
+
+    var yr = uel.data('size')*4;
+    var y = uel.data('y') + yr;
+
+    $(".text").each(function() {
+        var e = $(this);
+
+        if (e.data('y') >= y) e.data('y', e.data('y') + yr);
+        bigpicture.updateTextPosition(this);
+    })
+
+    return bigpicture.newText(
+        uel.data('x') + uel.data('size')/2*uel.text().length,
+        y,
+        uel.data('size'),
+        txt
+    );
 }

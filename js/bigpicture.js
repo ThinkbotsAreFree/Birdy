@@ -8,6 +8,7 @@
  * author:  Joseph Ernest (twitter: @JosephErnest)
  * url:     http://github.com/josephernest/bigpicture.js
  *
+ * modified version by: Zerooooo
  */
 const zoomFactor = 1.5;
 

@@ -26,7 +26,7 @@
     </div>
 
     <span id="info">
-        <span id="version">BirdyVM - Version 0.7.5 - </span>
+        <span id="version">BirdyVM - Version 0.8.0 - </span>
         <span id="status">Paused</span>
     </span>
 
@@ -83,6 +83,8 @@
 
             skin = !skin; console.log(skin);
         }
+
+        if ((new Date().getHours() >= 8 && (new Date().getHours() < 20))) switchSkin();
 
 
         new ClipboardJS('#copy');
@@ -323,7 +325,6 @@
                 }
             }
         );
-
         $("#user-input")[0].focus();
 
     </script>

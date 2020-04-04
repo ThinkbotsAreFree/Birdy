@@ -69,7 +69,7 @@ Another difference with classical chatbot engines is that BirdyVM is not a one-s
 
 A major advantage of this architecture is the opportunity to describe directly the structures of communicating modules where thoughts flow. It follows the Keep It Simple way of doing things. Ai should be a people's thing, not a corporation's thing. In BirdyVM, you create the mind of the bot at the highest level: the level you'd use to describe it orally to somebody. The way you'd describe it to someone else, is the very way you design your rules and units, with words and sentences.
 
-Consciousness is more than the inner discourse most of us humans experience everyday, but inner discourse is still the most obvious manifestation of our thinking processes. BirdyVM let's you create interacting inner discourse generators.
+Consciousness is more than the inner discourse most of us humans experience everyday, but inner discourse is still the most obvious manifestation of our thinking processes. BirdyVM lets you create interacting inner discourse generators.
 
 #### What design strategy might be followed by someone creating a chatbot using this architecture?
 
